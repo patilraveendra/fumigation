@@ -1,0 +1,122 @@
+.page-shell {
+    min-height: 100vh;
+    padding: 32px;
+    background: linear-gradient(180deg, #eef2ff 0%, #f8fafc 100%);
+    color: #0f172a;
+}
+
+.page-header {
+    max-width: 1200px;
+    margin: 0 auto 24px;
+    padding: 24px 28px;
+    border-radius: 20px;
+    background: #ffffff;
+    box-shadow: 0 20px 40px rgba(15, 23, 42, 0.08);
+}
+
+.eyebrow {
+    margin: 0 0 8px;
+    display: block;
+    font-size: 0.85rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #475569;
+}
+
+.page-header h1 {
+    margin: 0 0 8px;
+    font-size: 2rem;
+}
+
+.page-header p {
+    margin: 0;
+    color: #475569;
+}
+
+.certificate-form {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    gap: 24px;
+}
+
+.form-section {
+    background: #ffffff;
+    border-radius: 18px;
+    padding: 24px;
+    box-shadow: 0 18px 40px rgba(15, 23, 42, 0.06);
+}
+
+.form-section h2 {
+    margin: 0 0 18px;
+    font-size: 1.1rem;
+    letter-spacing: 0.01em;
+    color: #0f172a;
+}
+
+.field-grid {
+    display: grid;
+    gap: 16px;
+}
+
+.field-grid-two {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.field-item {
+    display: grid;
+    gap: 8px;
+}
+
+.field-item.full-width {
+    grid-column: 1 / -1;
+}
+
+.field-item span {
+    font-weight: 600;
+    color: #0f172a;
+}
+
+.field-item input,
+.field-item select,
+.field-item textarea {
+    width: 100%;
+    min-height: 44px;
+    padding: 12px 14px;
+    border: 1px solid #cbd5e1;
+    border-radius: 12px;
+    background: #f8fafc;
+    color: #0f172a;
+    font-size: 0.95rem;
+}
+
+.field-item textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 8px;
+}
+
+.primary-button {
+    padding: 14px 24px;
+    border: none;
+    border-radius: 12px;
+    background: #2563eb;
+    color: white;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.primary-button:hover {
+    background: #1d4ed8;
+}
+
+@media (max-width: 900px) {
+    .field-grid-two {
+        grid-template-columns: 1fr;
+    }
+}
