@@ -8,7 +8,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("LocalFrontend", policy =>
     {
         policy
-            .WithOrigins("http://localhost:5173", "http://127.0.0.1:5173")
+            .WithOrigins("http://localhost:5174", "http://127.0.0.1:5174")
             .AllowAnyHeader()
             .AllowAnyMethod();
     });
@@ -65,9 +65,10 @@ public sealed class CertificateStore
 
     public CertificateStore(string contentRootPath)
     {
-        var dataDirectory = Path.Combine(contentRootPath, "Data");
-        Directory.CreateDirectory(dataDirectory);
-        filePath = Path.Combine(dataDirectory, "certificates.json");
+        var monthName = DateTimeOffset.UtcNow.ToString("MMMM").ToLowerInvariant();
+        var monthDirectory = Path.Combine(contentRootPath, "Data", monthName);
+        Directory.CreateDirectory(monthDirectory);
+        filePath = Path.Combine(monthDirectory, "certificates.json");
     }
 
     public async Task<IReadOnlyList<CertificateRecord>> GetAllAsync()

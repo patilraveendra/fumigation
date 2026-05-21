@@ -1,7 +1,7 @@
 import { type ChangeEvent, type FormEvent, useState } from 'react';
 import { CertificateData } from '../types/certificate';
 import { generateCertificatePdf } from '../pdf/pdfService';
-import { saveCertificate } from '../api/apiService';
+import { fetchCertificates, saveCertificate, type CertificateRecord } from '../api/apiService';
 
 const initialData: CertificateData = {
     certificateType: 'MB',
@@ -40,10 +40,19 @@ const initialData: CertificateData = {
     fumigatorName: '',
 };
 
-function CertificateForm() {
+interface CertificateFormProps {
+    onLogout?: () => void;
+    onViewSaved?: () => void;
+}
+
+function CertificateForm({ onLogout, onViewSaved }: CertificateFormProps) {
     const [data, setData] = useState(initialData);
     const [saveStatus, setSaveStatus] = useState<string | null>(null);
     const [isSaving, setIsSaving] = useState(false);
+    const [savedRecords, setSavedRecords] = useState<CertificateRecord[]>([]);
+    const [selectedRecordId, setSelectedRecordId] = useState<string>('');
+    const [isFetchingRecords, setIsFetchingRecords] = useState(false);
+    const [fetchStatus, setFetchStatus] = useState<string | null>(null);
     const isMb = data.certificateType === 'MB';
 
     const handleInputChange = (
@@ -81,6 +90,38 @@ function CertificateForm() {
         }
     };
 
+    const loadSavedCertificates = async () => {
+        setFetchStatus(null);
+        setIsFetchingRecords(true);
+
+        try {
+            const records = await fetchCertificates();
+            setSavedRecords(records);
+            setFetchStatus(`${records.length} saved certificate(s) loaded.`);
+        } catch (error) {
+            const message = error instanceof Error ? error.message : 'Unknown error';
+            setFetchStatus(`Load failed: ${message}`);
+        } finally {
+            setIsFetchingRecords(false);
+        }
+    };
+
+    const handleSelectedRecordChange = (event: ChangeEvent<HTMLSelectElement>) => {
+        const selectedId = event.target.value;
+        setSelectedRecordId(selectedId);
+
+        const record = savedRecords.find((item) => item.id === selectedId);
+        if (!record) {
+            return;
+        }
+
+        setData((prev) => ({
+            ...prev,
+            ...record.data,
+        } as CertificateData));
+        setSaveStatus(`Loaded certificate ${record.data.certificateNumber ?? ''}`);
+    };
+
     return (
         <div className="page-shell">
             <header className="page-header">
@@ -89,9 +130,44 @@ function CertificateForm() {
                     <h1>Fumigation Certificate Generator</h1>
                     <p>Enter the details below, then generate a fixed-layout PDF.</p>
                 </div>
+                <div>
+                    {onViewSaved ? (
+                        <button type="button" className="secondary-button" onClick={onViewSaved}>
+                            View saved certificates
+                        </button>
+                    ) : null}
+                    {onLogout ? (
+                        <button type="button" className="secondary-button" onClick={onLogout}>
+                            Logout
+                        </button>
+                    ) : null}
+                </div>
             </header>
 
             <form className="certificate-form" onSubmit={(event: FormEvent<HTMLFormElement>) => event.preventDefault()}>
+                <section className="form-section">
+                    <h2>Saved Certificates</h2>
+                    <div className="field-grid field-grid-two">
+                        <button type="button" className="secondary-button" onClick={loadSavedCertificates} disabled={isFetchingRecords}>
+                            {isFetchingRecords ? 'Loading…' : 'Load saved certificates'}
+                        </button>
+                        {savedRecords.length > 0 ? (
+                            <label className="field-item">
+                                <span>Select certificate</span>
+                                <select value={selectedRecordId} onChange={handleSelectedRecordChange}>
+                                    <option value="">Choose a certificate</option>
+                                    {savedRecords.map((record) => (
+                                        <option key={record.id} value={record.id}>
+                                            {record.data.certificateNumber ?? record.id} — {new Date(record.createdAtUtc).toLocaleString()}
+                                        </option>
+                                    ))}
+                                </select>
+                            </label>
+                        ) : null}
+                    </div>
+                    {fetchStatus ? <div className="form-status"><p>{fetchStatus}</p></div> : null}
+                </section>
+
                 <section className="form-section">
                     <h2>Certificate Details</h2>
                     <div className="field-grid field-grid-two">
@@ -180,16 +256,6 @@ function CertificateForm() {
                         <label className="field-item">
                             <span>Date of Fumigation</span>
                             <input type="date" name="fumigationStarted" value={data.fumigationStarted} onChange={handleInputChange} />
-                        </label>
-                    </div>
-                </section>
-
-                <section className="form-section">
-                    <h2>Additional Declaration</h2>
-                    <div className="field-grid field-grid-two">
-                        <label className="field-item full-width">
-                            <span>Declaration Text</span>
-                            <textarea name="declarationText" value={data.declarationText} onChange={handleInputChange} rows={3} />
                         </label>
                     </div>
                 </section>
