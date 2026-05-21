@@ -1,0 +1,42 @@
+[
+  {
+    "Id": "94c1e32a-5ab7-493a-89fb-1f31bad6bd25",
+    "CreatedAtUtc": "2026-05-21T05:56:33.879268+00:00",
+    "Data": {
+      "certificateType": "MB",
+      "certificateNumber": "899943",
+      "dateIssued": "",
+      "providerId": "",
+      "accreditationNumber": "",
+      "clientName": "",
+      "clientAddress": "",
+      "exporterName": "rave",
+      "consigneeName": "",
+      "destinationCountry": "",
+      "portOfLoading": "",
+      "sealNumber": "",
+      "commodityDescription": "",
+      "commodityQuantity": "23",
+      "netWeight": "35",
+      "packagingMaterial": "",
+      "countryOfOrigin": "",
+      "shippingMark": "",
+      "fumigantName": "",
+      "placeOfFumigation": "23",
+      "doseRate": "",
+      "appliedDose": "",
+      "exposurePeriod": "",
+      "durationFumigation": "23",
+      "temperature": "",
+      "humidity": "",
+      "finalTlvReading": "",
+      "fumigationStarted": "",
+      "fumigationCompleted": "",
+      "gasTightSheets": "Yes",
+      "declarationText": "",
+      "invoiceNumber": "",
+      "invoiceDate": "",
+      "fumigatorName": ""
+    }
+  }
+]

@@ -3,12 +3,15 @@ using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()
+    ?? (Environment.GetEnvironmentVariable("CORS_ALLOWED_ORIGINS")?.Split(';') ?? new[] { "http://localhost:5173" });
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("LocalFrontend", policy =>
     {
         policy
-            .WithOrigins("http://localhost:5174", "http://127.0.0.1:5174")
+            .WithOrigins(allowedOrigins)
             .AllowAnyHeader()
             .AllowAnyMethod();
     });
