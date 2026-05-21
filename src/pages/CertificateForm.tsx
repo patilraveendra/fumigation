@@ -1,7 +1,7 @@
 import { type ChangeEvent, type FormEvent, useState } from 'react';
 import { CertificateData } from '../types/certificate';
 import { generateCertificatePdf } from '../pdf/pdfService';
-import { fetchCertificates, saveCertificate, type CertificateRecord } from '../api/apiService';
+import { saveCertificate } from '../api/apiService';
 
 const initialData: CertificateData = {
     certificateType: 'MB',
@@ -49,10 +49,6 @@ function CertificateForm({ onLogout, onViewSaved }: CertificateFormProps) {
     const [data, setData] = useState(initialData);
     const [saveStatus, setSaveStatus] = useState<string | null>(null);
     const [isSaving, setIsSaving] = useState(false);
-    const [savedRecords, setSavedRecords] = useState<CertificateRecord[]>([]);
-    const [selectedRecordId, setSelectedRecordId] = useState<string>('');
-    const [isFetchingRecords, setIsFetchingRecords] = useState(false);
-    const [fetchStatus, setFetchStatus] = useState<string | null>(null);
     const isMb = data.certificateType === 'MB';
 
     const handleInputChange = (
@@ -60,7 +56,6 @@ function CertificateForm({ onLogout, onViewSaved }: CertificateFormProps) {
     ) => {
         const name = event.target.name as keyof CertificateData;
         const value = event.target.value;
-
         setData((prev) => ({
             ...prev,
             [name]: value,
@@ -69,16 +64,13 @@ function CertificateForm({ onLogout, onViewSaved }: CertificateFormProps) {
 
     const handleGeneratePdf = async () => {
         setSaveStatus(null);
-
         try {
             await generateCertificatePdf(data);
         } catch (error) {
             setSaveStatus('PDF generation failed.');
             return;
         }
-
         setIsSaving(true);
-
         try {
             await saveCertificate(data);
             setSaveStatus('Certificate saved successfully.');
@@ -88,38 +80,6 @@ function CertificateForm({ onLogout, onViewSaved }: CertificateFormProps) {
         } finally {
             setIsSaving(false);
         }
-    };
-
-    const loadSavedCertificates = async () => {
-        setFetchStatus(null);
-        setIsFetchingRecords(true);
-
-        try {
-            const records = await fetchCertificates();
-            setSavedRecords(records);
-            setFetchStatus(`${records.length} saved certificate(s) loaded.`);
-        } catch (error) {
-            const message = error instanceof Error ? error.message : 'Unknown error';
-            setFetchStatus(`Load failed: ${message}`);
-        } finally {
-            setIsFetchingRecords(false);
-        }
-    };
-
-    const handleSelectedRecordChange = (event: ChangeEvent<HTMLSelectElement>) => {
-        const selectedId = event.target.value;
-        setSelectedRecordId(selectedId);
-
-        const record = savedRecords.find((item) => item.id === selectedId);
-        if (!record) {
-            return;
-        }
-
-        setData((prev) => ({
-            ...prev,
-            ...record.data,
-        } as CertificateData));
-        setSaveStatus(`Loaded certificate ${record.data.certificateNumber ?? ''}`);
     };
 
     return (
@@ -143,31 +103,7 @@ function CertificateForm({ onLogout, onViewSaved }: CertificateFormProps) {
                     ) : null}
                 </div>
             </header>
-
             <form className="certificate-form" onSubmit={(event: FormEvent<HTMLFormElement>) => event.preventDefault()}>
-                <section className="form-section">
-                    <h2>Saved Certificates</h2>
-                    <div className="field-grid field-grid-two">
-                        <button type="button" className="secondary-button" onClick={loadSavedCertificates} disabled={isFetchingRecords}>
-                            {isFetchingRecords ? 'Loading…' : 'Load saved certificates'}
-                        </button>
-                        {savedRecords.length > 0 ? (
-                            <label className="field-item">
-                                <span>Select certificate</span>
-                                <select value={selectedRecordId} onChange={handleSelectedRecordChange}>
-                                    <option value="">Choose a certificate</option>
-                                    {savedRecords.map((record) => (
-                                        <option key={record.id} value={record.id}>
-                                            {record.data.certificateNumber ?? record.id} — {new Date(record.createdAtUtc).toLocaleString()}
-                                        </option>
-                                    ))}
-                                </select>
-                            </label>
-                        ) : null}
-                    </div>
-                    {fetchStatus ? <div className="form-status"><p>{fetchStatus}</p></div> : null}
-                </section>
-
                 <section className="form-section">
                     <h2>Certificate Details</h2>
                     <div className="field-grid field-grid-two">
@@ -188,7 +124,6 @@ function CertificateForm({ onLogout, onViewSaved }: CertificateFormProps) {
                         </label>
                     </div>
                 </section>
-
                 <section className="form-section">
                     <h2>Client / Shipment Details</h2>
                     <div className="field-grid field-grid-two">
@@ -222,7 +157,6 @@ function CertificateForm({ onLogout, onViewSaved }: CertificateFormProps) {
                         </label>
                     </div>
                 </section>
-
                 <section className="form-section">
                     <h2>Treatment Details</h2>
                     <div className="field-grid field-grid-two">
@@ -259,7 +193,6 @@ function CertificateForm({ onLogout, onViewSaved }: CertificateFormProps) {
                         </label>
                     </div>
                 </section>
-
                 <section className="form-section">
                     <h2>Operator Details</h2>
                     <div className="field-grid field-grid-two">
@@ -269,13 +202,11 @@ function CertificateForm({ onLogout, onViewSaved }: CertificateFormProps) {
                         </label>
                     </div>
                 </section>
-
                 <div className="form-actions">
                     <button type="button" className="primary-button" onClick={handleGeneratePdf} disabled={isSaving}>
                         {isSaving ? 'Saving…' : 'Generate PDF'}
                     </button>
                 </div>
-
                 {saveStatus ? (
                     <div className="form-status">
                         <p>{saveStatus}</p>
