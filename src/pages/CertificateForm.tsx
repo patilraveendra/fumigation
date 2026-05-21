@@ -1,6 +1,7 @@
 import { type ChangeEvent, type FormEvent, useState } from 'react';
 import { CertificateData } from '../types/certificate';
 import { generateCertificatePdf } from '../pdf/pdfService';
+import { saveCertificate } from '../api/apiService';
 
 const initialData: CertificateData = {
     certificateType: 'MB',
@@ -41,6 +42,8 @@ const initialData: CertificateData = {
 
 function CertificateForm() {
     const [data, setData] = useState(initialData);
+    const [saveStatus, setSaveStatus] = useState<string | null>(null);
+    const [isSaving, setIsSaving] = useState(false);
     const isMb = data.certificateType === 'MB';
 
     const handleInputChange = (
@@ -56,7 +59,26 @@ function CertificateForm() {
     };
 
     const handleGeneratePdf = async () => {
-        await generateCertificatePdf(data);
+        setSaveStatus(null);
+
+        try {
+            await generateCertificatePdf(data);
+        } catch (error) {
+            setSaveStatus('PDF generation failed.');
+            return;
+        }
+
+        setIsSaving(true);
+
+        try {
+            await saveCertificate(data);
+            setSaveStatus('Certificate saved successfully.');
+        } catch (error) {
+            const message = error instanceof Error ? error.message : 'Unknown error';
+            setSaveStatus(`Save failed: ${message}`);
+        } finally {
+            setIsSaving(false);
+        }
     };
 
     return (
@@ -183,10 +205,16 @@ function CertificateForm() {
                 </section>
 
                 <div className="form-actions">
-                    <button type="button" className="primary-button" onClick={handleGeneratePdf}>
-                        Generate PDF
+                    <button type="button" className="primary-button" onClick={handleGeneratePdf} disabled={isSaving}>
+                        {isSaving ? 'Saving…' : 'Generate PDF'}
                     </button>
                 </div>
+
+                {saveStatus ? (
+                    <div className="form-status">
+                        <p>{saveStatus}</p>
+                    </div>
+                ) : null}
             </form>
         </div>
     );
