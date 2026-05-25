@@ -2,6 +2,7 @@ import { type ChangeEvent, type FormEvent, useState } from 'react';
 import { CertificateData } from '../types/certificate';
 import { generateCertificatePdf } from '../pdf/pdfService';
 import { saveCertificate } from '../api/apiService';
+import './CertificateForm.compact.css';
 
 const initialData: CertificateData = {
     certificateType: 'MB',
@@ -103,105 +104,107 @@ function CertificateForm({ onLogout, onViewSaved }: CertificateFormProps) {
                     ) : null}
                 </div>
             </header>
-            <form className="certificate-form" onSubmit={(event: FormEvent<HTMLFormElement>) => event.preventDefault()}>
-                <section className="form-section">
-                    <h2>Certificate Details</h2>
-                    <div className="field-grid field-grid-two">
-                        <label className="field-item">
-                            <span>Certificate Type</span>
+            <form className="certificate-form compact-form" onSubmit={(event: FormEvent<HTMLFormElement>) => event.preventDefault()}>
+                <div className="compact-section">
+                    <div className="compact-section-header">Certificate Details</div>
+                    <div className="compact-row">
+                        <label>
+                            Certificate Type
                             <select name="certificateType" value={data.certificateType} onChange={handleInputChange}>
                                 <option value="MB">MB</option>
                                 <option value="ALP">ALP</option>
                             </select>
                         </label>
-                        <label className="field-item">
-                            <span>Certificate Number</span>
+                        <label>
+                            Certificate Number
                             <input type="text" name="certificateNumber" value={data.certificateNumber} onChange={handleInputChange} />
                         </label>
-                        <label className="field-item">
-                            <span>Date Issued</span>
+                        <label>
+                            Date Issued
                             <input type="date" name="dateIssued" value={data.dateIssued} onChange={handleInputChange} />
                         </label>
                     </div>
-                </section>
-                <section className="form-section">
-                    <h2>Client / Shipment Details</h2>
-                    <div className="field-grid field-grid-two">
-                        <label className="field-item">
-                            <span>Exporter Name</span>
+                </div>
+                <div className="compact-section">
+                    <div className="compact-section-header">Client / Shipment Details</div>
+                    <div className="compact-row">
+                        <label>
+                            Exporter Name
                             <input type="text" name="exporterName" value={data.exporterName} onChange={handleInputChange} />
                         </label>
-                        <label className="field-item">
-                            <span>Consignee Name</span>
+                        <label>
+                            Consignee Name
                             <input type="text" name="consigneeName" value={data.consigneeName} onChange={handleInputChange} />
                         </label>
-                        <label className="field-item full-width">
-                            <span>Type and Description of Cargo</span>
+                        <label>
+                            Type and Description of Cargo
                             <input type="text" name="commodityDescription" value={data.commodityDescription} onChange={handleInputChange} />
                         </label>
-                        <label className="field-item">
-                            <span>Commodity Quantity</span>
+                    </div>
+                    <div className="compact-row">
+                        <label>
+                            Commodity Quantity
                             <input type="text" name="commodityQuantity" value={data.commodityQuantity} onChange={handleInputChange} />
                         </label>
-                        <label className="field-item">
-                            <span>Net Weight</span>
+                        <label>
+                            Net Weight
                             <input type="text" name="netWeight" value={data.netWeight} onChange={handleInputChange} />
                         </label>
-                        <label className="field-item">
-                            <span>Packaging Material</span>
+                        <label>
+                            Packaging Material
                             <input type="text" name="packagingMaterial" value={data.packagingMaterial} onChange={handleInputChange} />
                         </label>
-                        <label className="field-item full-width">
-                            <span>Shipping Mark / Brand</span>
+                        <label>
+                            Shipping Mark / Brand
                             <input type="text" name="shippingMark" value={data.shippingMark} onChange={handleInputChange} />
                         </label>
                     </div>
-                </section>
-                <section className="form-section">
-                    <h2>Treatment Details</h2>
-                    <div className="field-grid field-grid-two">
-                        <label className="field-item">
-                            <span>Name of Fumigant</span>
+                </div>
+                <div className="compact-section">
+                    <div className="compact-section-header">Treatment Details</div>
+                    <div className="compact-row">
+                        <label>
+                            Name of Fumigant
                             <input type="text" name="fumigantName" value={data.fumigantName} onChange={handleInputChange} />
                         </label>
-                        <label className="field-item">
-                            <span>Place of Fumigation</span>
+                        <label>
+                            Place of Fumigation
                             <input type="text" name="placeOfFumigation" value={data.placeOfFumigation} onChange={handleInputChange} />
                         </label>
-                        <label className="field-item">
-                            <span>Dose Rate</span>
+                        <label>
+                            Dose Rate
                             <input type="text" name="doseRate" value={data.doseRate} onChange={handleInputChange} />
                         </label>
-                        <label className="field-item">
-                            <span>Duration of Fumigation</span>
+                        <label>
+                            Duration of Fumigation
                             <input type="text" name="durationFumigation" value={data.durationFumigation} onChange={handleInputChange} />
                         </label>
                         {isMb ? (
-                            <label className="field-item">
-                                <span>Average Ambient Temperature</span>
+                            <label>
+                                Average Ambient Temperature
                                 <input type="text" name="temperature" value={data.temperature} onChange={handleInputChange} />
                             </label>
                         ) : (
-                            <label className="field-item">
-                                <span>Average Ambient Humidity</span>
+                            <label>
+                                Average Ambient Humidity
                                 <input type="text" name="humidity" value={data.humidity} onChange={handleInputChange} />
                             </label>
                         )}
-                        <label className="field-item">
-                            <span>Date of Fumigation</span>
+                        <label>
+                            Date of Fumigation
                             <input type="date" name="fumigationStarted" value={data.fumigationStarted} onChange={handleInputChange} />
                         </label>
                     </div>
-                </section>
-                <section className="form-section">
-                    <h2>Operator Details</h2>
-                    <div className="field-grid field-grid-two">
-                        <label className="field-item">
-                            <span>Fumigator Name / Accreditation Number</span>
+                </div>
+                <div className="compact-section">
+                    <div className="compact-section-header">Operator Details</div>
+                    <div className="compact-row">
+                        <label>
+                            Fumigator Name / Accreditation Number
                             <input type="text" name="fumigatorName" value={data.fumigatorName} onChange={handleInputChange} />
                         </label>
                     </div>
-                </section>
+                </div>
                 <div className="form-actions">
                     <button type="button" className="primary-button" onClick={handleGeneratePdf} disabled={isSaving}>
                         {isSaving ? 'Saving…' : 'Generate PDF'}

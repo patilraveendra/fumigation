@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { fetchCertificates, type CertificateRecord } from '../api/apiService';
 import { type CertificateData } from '../types/certificate';
+import './CertificateForm.compact.css';
 
 interface SavedCertificatesProps {
     onBack: () => void;
@@ -59,17 +60,14 @@ function SavedCertificates({ onBack, onLogout }: SavedCertificatesProps) {
                 </div>
             </header>
 
-            <section className="form-section">
-                <div className="field-grid field-grid-two">
-                    <div>
-                        <h2>Certificate list</h2>
-                        {isLoading ? <p>Loading certificates…</p> : null}
-                        {status ? <div className="form-status"><p>{status}</p></div> : null}
-                    </div>
+            <section className="compact-section">
+                <div className="compact-section-header">Certificate list</div>
+                <div className="compact-row">
+                    {isLoading ? <p>Loading certificates…</p> : null}
+                    {status ? <div className="form-status"><p>{status}</p></div> : null}
                 </div>
-
-                <div className="table-container">
-                    <table>
+                <div className="table-container compact-table-container">
+                    <table className="compact-table">
                         <thead>
                             <tr>
                                 <th>Certificate #</th>
@@ -105,9 +103,9 @@ function SavedCertificates({ onBack, onLogout }: SavedCertificatesProps) {
             </section>
 
             {selectedRecord ? (
-                <section className="form-section">
-                    <h2>Certificate details</h2>
-                    <div className="field-grid field-grid-two">
+                <section className="compact-section">
+                    <div className="compact-section-header">Certificate details</div>
+                    <div className="compact-row">
                         <div className="field-item">
                             <span>Certificate Number</span>
                             <p>{selectedRecord.data.certificateNumber ?? '—'}</p>
