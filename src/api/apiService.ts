@@ -49,3 +49,16 @@ export async function fetchCertificates() {
         throw error;
     }
 }
+
+export async function pingApi() {
+    try {
+        const response = await fetch(`${apiBaseUrl}/api/certificates`);
+        const text = await response.text();
+        return { ok: response.ok, status: response.status, body: text };
+    } catch (error) {
+        if (error instanceof Error) {
+            return { ok: false, status: 0, body: error.message };
+        }
+        return { ok: false, status: 0, body: 'Unknown error' };
+    }
+}

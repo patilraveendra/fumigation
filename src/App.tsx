@@ -1,27 +1,15 @@
+
 import './App.css';
-import { useState } from 'react';
-import CertificateForm from './pages/CertificateForm';
-import Login from './pages/Login';
-import SavedCertificates from './pages/SavedCertificates';
+import React, { useState } from 'react';
+import { BrowserRouter as Router } from 'react-router-dom';
+import AppRoutes from './routes';
 
 function App() {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
-    const [activePage, setActivePage] = useState<'form' | 'list'>('form');
-
-    if (!isAuthenticated) {
-        return <Login onLogin={() => setIsAuthenticated(true)} />;
-    }
-
-    return activePage === 'form' ? (
-        <CertificateForm
-            onLogout={() => setIsAuthenticated(false)}
-            onViewSaved={() => setActivePage('list')}
-        />
-    ) : (
-        <SavedCertificates
-            onLogout={() => setIsAuthenticated(false)}
-            onBack={() => setActivePage('form')}
-        />
+    return (
+        <Router>
+            <AppRoutes isAuthenticated={isAuthenticated} setIsAuthenticated={setIsAuthenticated} />
+        </Router>
     );
 }
 
