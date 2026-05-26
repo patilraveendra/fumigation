@@ -61,6 +61,8 @@ const initialData: CertificateData = {
     f_doserate: '',
     f_dosetype: '',
     f_duration: '',
+    f_duration_days: '',
+    f_duration_hours: '',
     f_hour: '',
     f_temperature: '',
     f_ttype: '',
@@ -73,6 +75,84 @@ const initialData: CertificateData = {
     oremark: '',
     invoiceno: '',
 };
+
+const mbFumigantOptions = [
+    'Methyl Bromide',
+    'Methyl Bromide',
+    'Methyl Bromide (MBR)',
+    'Methyl Bromide (MB)',
+    'Methyl Bromide (CH3BR)',
+];
+
+const alpFumigantOptions = [
+    'Aluminium Phosphide',
+    'Aluminium Phosphine',
+    'Aluminium Phosphide 56%',
+    'PHOSPHINE (PH3)',
+    'PHOSPHINE',
+    'ALUMINIUM PHOSPHIDE (PHOSPHINE)',
+    'FOSFAMINA (Aluminium Phosphide)',
+];
+
+const mbDosageTypeOptions = [
+    { value: 'GRMS /CU.M', label: 'GRMS /CU.M' },
+    { value: 'GRMS /CU.M', label: 'GRMS /CU.M' },
+    { value: 'GMS/M3', label: 'GMS/M3' },
+    { value: 'GRAMS /CU.M', label: 'GRAMS /CU.M' },
+    { value: 'GRAMS/M3', label: 'GRAMS/M3' },
+    { value: 'LBS Per 1000 CubiK Feet', label: 'LBS Per 1000 Cubik Feet' },
+    { value: 'GRMS/M3', label: 'GRMS/M3' },
+    { value: 'GRAMS/M3', label: 'GRAMS/M3' },
+    { value: ' ', label: '\u00a0\u00a0' },
+];
+
+const alpDosageTypeOptions = [
+    { value: 'Gram/MT', label: 'Gram/MT' },
+    { value: 'Gram/MT', label: 'Gram/MT' },
+    { value: 'MG/M3', label: 'MG/M3' },
+    { value: 'GRAMS/M3(4 GRAMS(PH3))', label: 'GRAMS/M3(4 GRAMS(PH3))' },
+    { value: 'GRAMS/TON', label: 'GRAMS/TON' },
+    { value: 'LBS Per 1000 Cubic Feet', label: 'LBS Per 1000 Cubic Feet' },
+    { value: 'GR/M3', label: 'GR/M3' },
+    { value: 'GRMS/M3', label: 'GRMS/M3' },
+    { value: 'GRAMS/M3', label: 'GRAMS/M3' },
+    { value: 'Gram Per Cum', label: 'Gram Per Cum' },
+    { value: 'Tablets per MT', label: 'Tablets per MT' },
+    { value: 'TABLETS/M3', label: 'TABLETS/M3' },
+    { value: '100 m<sup>3</sup>', label: '100 m\u00b3' },
+    { value: 'gm/100 m<sup>3</sup>', label: 'gm/100 m\u00b3' },
+];
+
+const mbDurationUnitOptions = [
+    { value: 'HOURS', label: 'HOURS' },
+    { value: 'hours', label: 'hours' },
+];
+
+const alpDurationUnitOptions = [
+    { value: 'Days', label: 'Days' },
+    { value: 'DAYS', label: 'DAYS' },
+    { value: 'Hours', label: 'Hours' },
+    { value: 'HOURS', label: 'HOURS' },
+];
+
+function formatAlpDuration(days?: string, hours?: string) {
+    const cleanDays = days?.trim() ?? '';
+    const cleanHours = hours?.trim() ?? '';
+
+    if (cleanDays && cleanHours) {
+        return `${cleanDays} Days [${cleanHours} Hours]`;
+    }
+
+    if (cleanDays) {
+        return `${cleanDays} Days`;
+    }
+
+    if (cleanHours) {
+        return `${cleanHours} Hours`;
+    }
+
+    return '';
+}
 
 interface CertificateFormProps {
     onLogout?: () => void;
@@ -121,6 +201,49 @@ function CertificateForm({ onLogout, onViewSaved, initialType, initialValues }: 
     ) => {
         const name = event.target.name as keyof CertificateData;
         const value = event.target.value;
+
+        if (name === 'certificateType') {
+            const nextFumigantOptions = value === 'ALP' ? alpFumigantOptions : mbFumigantOptions;
+            const nextDosageOptions = value === 'ALP' ? alpDosageTypeOptions : mbDosageTypeOptions;
+
+            setData((prev) => ({
+                ...prev,
+                certificateType: value,
+                f_type: nextFumigantOptions.includes(prev.f_type ?? '') ? prev.f_type : nextFumigantOptions[0],
+                f_dosetype: nextDosageOptions.some((option) => option.value === prev.f_dosetype) ? prev.f_dosetype : nextDosageOptions[0].value,
+                f_hour: value === 'ALP'
+                    ? ''
+                    : (mbDurationUnitOptions.some((option) => option.value === prev.f_hour) ? prev.f_hour : mbDurationUnitOptions[0].value),
+            } as CertificateData));
+            return;
+        }
+
+        if (name === 'f_duration' || name === 'durationFumigation') {
+            setData((prev) => ({
+                ...prev,
+                f_duration: value,
+                durationFumigation: value,
+            } as CertificateData));
+            return;
+        }
+
+        if (name === 'f_duration_days' || name === 'f_duration_hours') {
+            setData((prev) => {
+                const nextDays = name === 'f_duration_days' ? value : prev.f_duration_days;
+                const nextHours = name === 'f_duration_hours' ? value : prev.f_duration_hours;
+                const nextDuration = formatAlpDuration(nextDays, nextHours);
+
+                return {
+                    ...prev,
+                    [name]: value,
+                    f_duration: nextDuration,
+                    durationFumigation: nextDuration,
+                    f_hour: '',
+                } as CertificateData;
+            });
+            return;
+        }
+
         setData((prev) => ({
             ...prev,
             [name]: value,
@@ -172,7 +295,7 @@ function CertificateForm({ onLogout, onViewSaved, initialType, initialValues }: 
 
             <form onSubmit={(event: FormEvent<HTMLFormElement>) => event.preventDefault()}>
                 <div className="row">
-                    <div className="col-md-8">
+                    <div className="col-12">
                         <div className="card mb-3">
                             <div className="card-header">Certificate Details</div>
                             <div className="card-body">
@@ -281,13 +404,9 @@ function CertificateForm({ onLogout, onViewSaved, initialType, initialValues }: 
 
 
                                 <div className="row g-3 mt-3">
-                                    <div className="col-md-6">
+                                    <div className="col-md-12">
                                         <label className="form-label">Quantity Declared</label>
                                         <textarea name="quantityDeclared" value={data.quantityDeclared} onChange={handleInputChange} className="form-control" rows={4} />
-                                    </div>
-                                    <div className="col-md-6">
-                                        <label className="form-label">Type and description of cargo</label>
-                                        <textarea name="marks" value={data.marks} onChange={handleInputChange} className="form-control" rows={4} />
                                     </div>
                                 </div>
 
@@ -340,10 +459,9 @@ function CertificateForm({ onLogout, onViewSaved, initialType, initialValues }: 
                                     <div className="col-md-4">
                                         <label className="form-label">Name of Fumigation</label>
                                         <select name="f_type" value={data.f_type} onChange={handleInputChange} className="form-select">
-                                            <option value="Methyl Bromide">Methyl Bromide</option>
-                                            <option value="Methyl Bromide (MBR)">Methyl Bromide (MBR)</option>
-                                            <option value="Methyl Bromide (MB)">Methyl Bromide (MB)</option>
-                                            <option value="Methyl Bromide (CH3BR)">Methyl Bromide (CH3BR)</option>
+                                            {(isMb ? mbFumigantOptions : alpFumigantOptions).map((option, index) => (
+                                                <option key={`${option}-${index}`} value={option}>{option}</option>
+                                            ))}
                                         </select>
                                     </div>
                                     <div className="col-md-4">
@@ -355,10 +473,9 @@ function CertificateForm({ onLogout, onViewSaved, initialType, initialValues }: 
                                         <div className="d-flex gap-2">
                                             <input type="text" name="f_doserate" value={data.f_doserate} onChange={handleInputChange} className="form-control" />
                                             <select name="f_dosetype" value={data.f_dosetype} onChange={handleInputChange} className="form-select" style={{ maxWidth: 160 }}>
-                                                <option value="GRMS /CU.M">GRMS /CU.M</option>
-                                                <option value="GMS/M3">GMS/M3</option>
-                                                <option value="GRAMS /CU.M">GRAMS /CU.M</option>
-                                                <option value="LBS Per 1000 CubiK Feet">LBS Per 1000 Cubik Feet</option>
+                                                {(isMb ? mbDosageTypeOptions : alpDosageTypeOptions).map((option, index) => (
+                                                    <option key={`${option.value}-${index}`} value={option.value}>{option.label}</option>
+                                                ))}
                                             </select>
                                         </div>
                                     </div>
@@ -366,13 +483,23 @@ function CertificateForm({ onLogout, onViewSaved, initialType, initialValues }: 
                                 <div className="row g-3 mt-2">
                                     <div className="col-md-4">
                                         <label className="form-label">Duration of Fumigation</label>
-                                        <div className="d-flex gap-2">
-                                            <input type="text" name="durationFumigation" value={data.durationFumigation} onChange={handleInputChange} className="form-control" />
-                                            <select name="f_hour" value={data.f_hour} onChange={handleInputChange} className="form-select" style={{ maxWidth: 120 }}>
-                                                <option value="hours">hours</option>
-                                                <option value="HOURS">HOURS</option>
-                                            </select>
-                                        </div>
+                                        {isMb ? (
+                                            <div className="d-flex gap-2">
+                                                <input type="text" name="f_duration" value={data.f_duration || data.durationFumigation} onChange={handleInputChange} className="form-control" />
+                                                <select name="f_hour" value={data.f_hour} onChange={handleInputChange} className="form-select" style={{ maxWidth: 120 }}>
+                                                    {mbDurationUnitOptions.map((option) => (
+                                                        <option key={option.value} value={option.value}>{option.label}</option>
+                                                    ))}
+                                                </select>
+                                            </div>
+                                        ) : (
+                                            <div className="d-flex gap-2 align-items-center">
+                                                <input type="text" name="f_duration_days" value={data.f_duration_days} onChange={handleInputChange} className="form-control" />
+                                                <span>Days</span>
+                                                <input type="text" name="f_duration_hours" value={data.f_duration_hours} onChange={handleInputChange} className="form-control" />
+                                                <span>Hours</span>
+                                            </div>
+                                        )}
                                     </div>
                                     <div className="col-md-4">
                                         {isMb ? (
@@ -469,41 +596,25 @@ function CertificateForm({ onLogout, onViewSaved, initialType, initialValues }: 
                                 </div>
                             </div>
                         </div>
-                        <div className="d-flex justify-content-end mb-4">
-                            <button type="button" className="btn btn-primary" onClick={handleGeneratePdf} disabled={isSaving}>
-                                {isSaving ? 'Saving…' : 'Generate PDF'}
+                        <div className="d-flex gap-2 justify-content-end mb-4">
+                            <button type="button" className="btn btn-success" onClick={handleGeneratePdf} disabled={isSaving}>
+                                {isSaving ? 'Saving…' : 'Generate & Save'}
                             </button>
+                            <button type="button" className="btn btn-outline-primary" onClick={() => {
+                                try {
+                                    sessionStorage.setItem('printData', JSON.stringify(data));
+                                    window.open('/print', '_blank');
+                                } catch (err) {
+                                    setSaveStatus('Failed to open print view.');
+                                }
+                            }}>Open Print View</button>
+                            <button type="button" className="btn btn-outline-secondary" onClick={() => (onViewSaved ? onViewSaved() : navigate('/list'))}>View saved certificates</button>
                         </div>
                         {saveStatus ? (
                             <div className="form-status">
                                 <p>{saveStatus}</p>
                             </div>
                         ) : null}
-                    </div>
-                    <div className="col-md-4">
-                        <div className="card">
-                            <div className="card-header">Actions & Status</div>
-                            <div className="card-body">
-                                {saveStatus ? (
-                                    <div className="alert alert-info">{saveStatus}</div>
-                                ) : (
-                                    <p className="text-muted">No recent actions.</p>
-                                )}
-                                <div className="d-grid">
-                                    <button type="button" className="btn btn-success mb-2" onClick={handleGeneratePdf} disabled={isSaving}>{isSaving ? 'Saving…' : 'Generate & Save'}</button>
-                                    <button type="button" className="btn btn-outline-primary mb-2" onClick={() => {
-                                        try {
-                                            sessionStorage.setItem('printData', JSON.stringify(data));
-                                            window.open('/print', '_blank');
-                                        } catch (err) {
-                                            // fallback: show status
-                                            setSaveStatus('Failed to open print view.');
-                                        }
-                                    }}>Open Print View</button>
-                                    <button type="button" className="btn btn-outline-secondary" onClick={() => (onViewSaved ? onViewSaved() : navigate('/list'))}>View saved certificates</button>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </form>

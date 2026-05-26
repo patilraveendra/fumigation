@@ -58,6 +58,8 @@ export interface CertificateData {
     f_doserate?: string;
     f_dosetype?: string;
     f_duration?: string;
+    f_duration_days?: string;
+    f_duration_hours?: string;
     f_hour?: string;
     f_temperature?: string;
     f_ttype?: string;

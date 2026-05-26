@@ -10,7 +10,7 @@ const Layout: React.FC<{ children: React.ReactNode; onLogout?: () => void }> = (
             </div>
             <ul className="nav nav-pills flex-column mb-auto">
                 <li className="nav-item">
-                    <Link to="/form" className="nav-link text-light" activeclassname="active">
+                    <Link to="/form" className="nav-link text-light">
                         <i className="bi bi-file-earmark-text me-2" /> Certificate Form
                     </Link>
                     <ul className="nav flex-column ms-2">
