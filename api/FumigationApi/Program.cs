@@ -1,7 +1,20 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddScoped<IDatabaseService, DatabaseService>();
+
+builder.Services.ConfigureHttpJsonOptions(options =>
+{
+    options.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+    options.SerializerOptions.PropertyNameCaseInsensitive = true;
+    options.SerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+    options.SerializerOptions.Converters.Add(new NullableDateTimeConverter());
+});
 
 var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()
     ?? (Environment.GetEnvironmentVariable("CORS_ALLOWED_ORIGINS")?.Split(';') ?? new[] { "http://localhost:5173" });
@@ -18,6 +31,20 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
+
+// Auto-migrate database on startup
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    try
+    {
+        dbContext.Database.EnsureCreated();
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Database migration failed: {ex.Message}");
+    }
+}
 
 app.UseCors("LocalFrontend");
 
@@ -45,6 +72,46 @@ app.MapGet("/api/certificates", async () =>
 {
     var records = await store.GetAllAsync();
 
+    return Results.Ok(records);
+});
+
+// SQL-backed MB Certificate endpoints
+app.MapPost("/api/mb/certificates", async (MbCertificate record, IDatabaseService db) =>
+{
+    try
+    {
+        var saved = await db.SaveMbCertificateAsync(record);
+        return Results.Created($"/api/mb/certificates/{saved.CertificateId}", saved);
+    }
+    catch (Exception ex)
+    {
+        return Results.BadRequest(new { error = ex.Message, type = ex.GetType().Name });
+    }
+});
+
+app.MapGet("/api/mb/certificates", async (IDatabaseService db) =>
+{
+    var records = await db.GetAllMbCertificatesAsync();
+    return Results.Ok(records);
+});
+
+// SQL-backed ALP Certificate endpoints
+app.MapPost("/api/alp/certificates", async (AlpCertificate record, IDatabaseService db) =>
+{
+    try
+    {
+        var saved = await db.SaveAlpCertificateAsync(record);
+        return Results.Created($"/api/alp/certificates/{saved.CertificateId}", saved);
+    }
+    catch (Exception ex)
+    {
+        return Results.BadRequest(new { error = ex.Message, type = ex.GetType().Name });
+    }
+});
+
+app.MapGet("/api/alp/certificates", async (IDatabaseService db) =>
+{
+    var records = await db.GetAllAlpCertificatesAsync();
     return Results.Ok(records);
 });
 

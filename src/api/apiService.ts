@@ -9,8 +9,12 @@ export type CertificateRecord = {
 };
 
 export async function saveCertificate(data: CertificateData) {
+    const endpoint = data.certificateType === 'MB'
+        ? `${apiBaseUrl}/api/mb/certificates`
+        : `${apiBaseUrl}/api/alp/certificates`;
+
     try {
-        const response = await fetch(`${apiBaseUrl}/api/certificates`, {
+        const response = await fetch(endpoint, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

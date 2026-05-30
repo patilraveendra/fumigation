@@ -2,12 +2,16 @@ import { PDFDocument } from 'pdf-lib';
 import { CertificateType } from '../types/certificate';
 
 const templateUrls: Record<CertificateType, string> = {
-    MB: new URL('../samples/MB_CERT_STACK.pdf', import.meta.url).href,
-    ALP: new URL('../samples/ALP_CERT_STACK.pdf', import.meta.url).href,
+    MB: '/MB_CERT_STACK.pdf',
+    ALP: '/ALP_CERT_STACK.pdf',
 };
 
 export async function createTemplatePage(pdfDoc: PDFDocument, certificateType: CertificateType) {
-    const response = await fetch(templateUrls[certificateType]);
+    const url = templateUrls[certificateType];
+    const response = await fetch(url);
+    if (!response.ok) {
+        throw new Error(`Failed to load PDF template for ${certificateType}: ${response.status} ${response.statusText}`);
+    }
     const templateBytes = await response.arrayBuffer();
     const templateDoc = await PDFDocument.load(templateBytes);
     const templatePage = templateDoc.getPage(0);

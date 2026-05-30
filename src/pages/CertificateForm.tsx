@@ -1,4 +1,4 @@
-import { type ChangeEvent, type FormEvent, useState } from 'react';
+import { type ChangeEvent, type FormEvent, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CertificateData } from '../types/certificate';
 import { generateCertificatePdf } from '../pdf/pdfService';
@@ -172,6 +172,14 @@ function CertificateForm({ onLogout, onViewSaved, initialType, initialValues }: 
     const [containers, setContainers] = useState<Array<{ cont?: string; seal?: string }>>(data.containers ?? []);
     const isMb = data.certificateType === 'MB';
 
+    useEffect(() => {
+        try {
+            sessionStorage.setItem('printData', JSON.stringify(data));
+        } catch (err) {
+            // ignore
+        }
+    }, [data.cnoat, data.containers]);
+
     const addContainer = () => {
         setContainers((prev) => {
             const next = [...prev, { cont: '', seal: '' }];
@@ -255,7 +263,9 @@ function CertificateForm({ onLogout, onViewSaved, initialType, initialValues }: 
         try {
             await generateCertificatePdf(data);
         } catch (error) {
-            setSaveStatus('PDF generation failed.');
+            const message = error instanceof Error ? error.message : String(error);
+            setSaveStatus(`PDF generation failed: ${message}`);
+            console.error('PDF generation error:', error);
             return;
         }
         setIsSaving(true);
@@ -516,7 +526,12 @@ function CertificateForm({ onLogout, onViewSaved, initialType, initialValues }: 
                                         ) : (
                                             <>
                                                 <label className="form-label">Average Ambient Humidity</label>
-                                                <input type="text" name="humidity" value={data.humidity} onChange={handleInputChange} className="form-control" />
+                                                <div className="d-flex gap-2 align-items-center">
+                                                    <input type="text" name="humidity" value={data.humidity} onChange={handleInputChange} className="form-control" style={{ maxWidth: 120 }} />
+                                                    <span>%</span>
+                                                    <input type="text" name="temperature" value={data.temperature} onChange={handleInputChange} className="form-control" style={{ maxWidth: 100 }} />
+                                                    <span>°C</span>
+                                                </div>
                                             </>
                                         )}
                                     </div>

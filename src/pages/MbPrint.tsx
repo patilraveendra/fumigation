@@ -103,7 +103,7 @@ const MbPrint: React.FC<MbPrintProps> = ({ data }) => {
                                     </tr>
                                     <tr>
                                         <td
-                                            width="48%"
+                                            width="55%"
                                             rowSpan={2}
                                             valign="top"
                                             align="left"
@@ -118,20 +118,18 @@ const MbPrint: React.FC<MbPrintProps> = ({ data }) => {
                                                 <span style={{ float: 'right' }}>DT: 27-07-2010</span>
                                             </strong>
                                         </td>
-                                        <td width="52%" height="20" style={cell('tr')}>
+                                        <td width="45%" height="20" style={cell('tr')}>
                                             <strong>Treatment Certificate Number :&nbsp; {value(data.certificateNumber)}</strong>
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td width="52%" height="20" style={cell('trb')}>
+                                        <td width="45%" height="20" style={cell('trb')}>
                                             <strong>Date of Issue :&nbsp;{formatDate(value(data.dateIssued))}</strong>
                                         </td>
                                     </tr>
                                     <tr>
                                         <td height="33" colSpan={2} style={paragraph}>
                                             &nbsp;&nbsp;&nbsp;&nbsp;This is to certify that the goods described below were treated in accordance with the fumigation treatment requirements of importing country <strong>&nbsp;{destinationCountry}</strong>, and declared that the consignment has been verified free of impervious surface/layers such as plastic wrapping or laminated plastic films, lacquered or painted surfaces, Aluminum foil, tarred or waxed paper etc. that may adversely affect the penetration of the fumigant, prior to fumigation.
-                                            <br />
-                                            &nbsp;&nbsp;&nbsp;&nbsp;The Certificate is valid for the consignments shipped within 21 days from the date of completion of fumigation.
                                         </td>
                                     </tr>
                                 </tbody>
