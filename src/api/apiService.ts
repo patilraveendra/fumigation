@@ -18,7 +18,10 @@ export async function saveCertificate(data: CertificateData) {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                // Add a client-side origin header for debugging (cannot replace browser-sent Origin)
+                'X-Client-Origin': typeof window !== 'undefined' ? window.location.origin : '',
             },
+            mode: 'cors',
             body: JSON.stringify(data),
         });
 
@@ -32,6 +35,21 @@ export async function saveCertificate(data: CertificateData) {
         if (error instanceof Error) {
             throw new Error(`Failed to reach API at ${apiBaseUrl}: ${error.message}`);
         }
+        throw error;
+    }
+}
+
+// Call server debug endpoint to echo headers/originAllowed (useful for remote debugging)
+export async function debugServer() {
+    try {
+        const response = await fetch(`${apiBaseUrl}/debug`, { method: 'GET', mode: 'cors' });
+        if (!response.ok) {
+            const text = await response.text();
+            throw new Error(`Debug API error (${response.status}): ${text || response.statusText}`);
+        }
+        return response.json();
+    } catch (error) {
+        if (error instanceof Error) throw new Error(`Failed to reach debug endpoint at ${apiBaseUrl}: ${error.message}`);
         throw error;
     }
 }

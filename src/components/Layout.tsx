@@ -6,7 +6,7 @@ const Layout: React.FC<{ children: React.ReactNode; onLogout?: () => void }> = (
         {/* Sidebar */}
         <nav className="sidebar bg-dark text-light d-flex flex-column p-3" style={{ width: 220 }}>
             <div className="mb-4 d-flex align-items-center gap-2">
-                <img src="/pas-logo.svg" alt="PAS" className="sidebar-logo" />
+                <img src="/logo.png" alt="PAS" className="sidebar-logo" />
                 <div>
                     <div className="fs-6 fw-bold">Pest & Solutions</div>
                     <div className="small text-light-50">Fumigation</div>
@@ -47,7 +47,7 @@ const Layout: React.FC<{ children: React.ReactNode; onLogout?: () => void }> = (
             <nav className="navbar navbar-expand navbar-dark bg-dark shadow-sm px-4" style={{ minHeight: 56 }}>
                 <div className="container-fluid">
                     <div className="d-flex align-items-center">
-                        <img src="/pas-logo.svg" alt="PAS" className="topbar-logo me-2" />
+                        <img src="/logo.png" alt="PAS" className="topbar-logo me-2" />
                         <span className="navbar-brand mb-0 h6 text-white">Fumigation & Pest Control</span>
                     </div>
                     <div className="d-flex align-items-center">

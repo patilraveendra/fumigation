@@ -1,4 +1,9 @@
+using System.Linq;
 using System.Text.Json;
+using System.IO;
+using System.Diagnostics;
+using Serilog;
+using Serilog.Events;
 using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
 
@@ -19,16 +24,37 @@ builder.Services.ConfigureHttpJsonOptions(options =>
 var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()
     ?? (Environment.GetEnvironmentVariable("CORS_ALLOWED_ORIGINS")?.Split(';') ?? new[] { "http://localhost:5173" });
 
+// Ensure production frontend origin is present when deployed
+var extras = new[] { "https://crmpestandsolutions.in", "https://www.crmpestandsolutions.in" };
+allowedOrigins = allowedOrigins.Concat(extras).Distinct().ToArray();
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("LocalFrontend", policy =>
     {
+        // Allow the configured origins and wildcard subdomains (use carefully)
         policy
             .WithOrigins(allowedOrigins)
+            .SetIsOriginAllowedToAllowWildcardSubdomains()
             .AllowAnyHeader()
-            .AllowAnyMethod();
+            .AllowAnyMethod()
+            .AllowCredentials();
     });
 });
+
+// Configure Serilog for file + console logging
+var logsPath = Path.Combine(builder.Environment.ContentRootPath, "logs");
+Directory.CreateDirectory(logsPath);
+
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Debug()
+    .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
+    .Enrich.FromLogContext()
+    .WriteTo.Console()
+    .WriteTo.File(Path.Combine(logsPath, "log-.txt"), rollingInterval: RollingInterval.Day, retainedFileCountLimit: 30)
+    .CreateLogger();
+
+builder.Host.UseSerilog();
 
 var app = builder.Build();
 
@@ -48,7 +74,26 @@ using (var scope = app.Services.CreateScope())
 
 app.UseCors("LocalFrontend");
 
+// Use Serilog's request logging middleware (records requests/responses)
+app.UseSerilogRequestLogging();
+
 var store = new CertificateStore(app.Environment.ContentRootPath);
+
+// Diagnostic endpoint for CORS debugging — echoes headers and whether Origin is allowed
+app.MapGet("/debug", (HttpContext ctx) =>
+{
+    var origin = ctx.Request.Headers["Origin"].ToString();
+    var headers = ctx.Request.Headers.ToDictionary(k => k.Key, v => v.Value.ToString());
+    var originAllowed = !string.IsNullOrEmpty(origin) && allowedOrigins.Any(o => string.Equals(o, origin, StringComparison.OrdinalIgnoreCase));
+
+    return Results.Ok(new
+    {
+        origin = origin,
+        originAllowed = originAllowed,
+        allowedOrigins = allowedOrigins,
+        headers = headers,
+    });
+});
 
 app.MapGet("/", () => Results.Ok(new
 {
@@ -115,7 +160,14 @@ app.MapGet("/api/alp/certificates", async (IDatabaseService db) =>
     return Results.Ok(records);
 });
 
-app.Run();
+try
+{
+    app.Run();
+}
+finally
+{
+    Log.CloseAndFlush();
+}
 
 public sealed record CertificateRecord(
     Guid Id,
