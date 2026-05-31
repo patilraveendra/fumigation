@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { fetchCertificates, type CertificateRecord } from '../api/apiService';
 import { pingApi } from '../api/apiService';
 import { type CertificateData } from '../types/certificate';
+import MbPrint from './MbPrint';
+import AlpPrint from './AlpPrint';
 import './CertificateForm.compact.css';
 
 interface SavedCertificatesProps {
@@ -57,6 +59,16 @@ function SavedCertificates({ onBack, onLogout, initialType }: SavedCertificatesP
     const selectedRecord = records.find((record) => record.id === selectedRecordId);
     const filteredRecords = records.filter((r) => (r.data.certificateType ?? 'MB') === selectedType);
     const navigate = useNavigate();
+
+    const openInPrintTab = (record: CertificateRecord) => {
+        try {
+            sessionStorage.setItem('printData', JSON.stringify(record.data));
+            window.open('/print', '_blank');
+        } catch (e) {
+            console.error('Failed to open print tab', e);
+            setStatus('Failed to open print tab.');
+        }
+    };
 
     return (
         <div className="container-fluid">
@@ -123,7 +135,7 @@ function SavedCertificates({ onBack, onLogout, initialType }: SavedCertificatesP
                                                     <td>{getPartyName(record.data)}</td>
                                                     <td>{record.data.certificateType ?? '—'}</td>
                                                     <td>
-                                                        <button type="button" className="btn btn-sm btn-outline-primary" onClick={() => setSelectedRecordId(record.id)}>View</button>
+                                                        <button type="button" className="btn btn-sm btn-outline-primary" onClick={() => openInPrintTab(record)}>View</button>
                                                     </td>
                                                 </tr>
                                             ))
@@ -137,25 +149,17 @@ function SavedCertificates({ onBack, onLogout, initialType }: SavedCertificatesP
 
                 <div className="col-lg-4">
                     {selectedRecord ? (
-                        <div className="card">
-                            <div className="card-header">Certificate details</div>
-                            <div className="card-body">
-                                <div className="mb-2"><strong>Certificate Number:</strong> {selectedRecord.data.certificateNumber ?? '—'}</div>
-                                <div className="mb-2"><strong>Date Issued:</strong> {selectedRecord.data.dateIssued ?? '—'}</div>
-                                <div className="mb-2"><strong>Date of Fumigation:</strong> {selectedRecord.data.fumigationStarted ?? '—'}</div>
-                                <div className="mb-2"><strong>Fumigator Name:</strong> {selectedRecord.data.fumigatorName ?? '—'}</div>
-                                <div className="mb-2"><strong>Certificate Type:</strong> {selectedRecord.data.certificateType ?? '—'}</div>
-                                <div className="mb-2"><strong>Party Name:</strong> {getPartyName(selectedRecord.data)}</div>
-                                <div className="mb-2"><strong>Exporter:</strong> {selectedRecord.data.exporterName ?? '—'}</div>
-                                <div className="mb-2"><strong>Consignee:</strong> {selectedRecord.data.consigneeName ?? '—'}</div>
-                                <div className="mb-2"><strong>Fumigant:</strong> {selectedRecord.data.fumigantName ?? '—'}</div>
-                                <div className="mb-2"><strong>Place:</strong> {selectedRecord.data.placeOfFumigation ?? '—'}</div>
-                                <div className="mb-2"><strong>Dose Rate:</strong> {selectedRecord.data.doseRate ?? '—'}</div>
-                                <div className="mb-2"><strong>Duration:</strong> {selectedRecord.data.durationFumigation ?? '—'}</div>
-                                <div className="mb-2"><strong>Temperature:</strong> {selectedRecord.data.temperature ?? '—'}</div>
-                                <div className="mb-2"><strong>Humidity:</strong> {selectedRecord.data.humidity ?? '—'}</div>
+                        <>
+                            <div className="d-flex justify-content-end mb-2">
+                                <button className="btn btn-sm btn-outline-primary" onClick={() => openInPrintTab(selectedRecord)}>Open preview in new tab</button>
                             </div>
-                        </div>
+                            {/* Render the same preview component used by the create/print flow */}
+                            {selectedRecord.data.certificateType === 'ALP' ? (
+                                <AlpPrint data={selectedRecord.data as CertificateData} />
+                            ) : (
+                                <MbPrint data={selectedRecord.data as CertificateData} />
+                            )}
+                        </>
                     ) : (
                         <div className="card">
                             <div className="card-body text-muted">Select a certificate to view details here.</div>

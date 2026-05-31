@@ -38,14 +38,39 @@ export async function saveCertificate(data: CertificateData) {
 
 export async function fetchCertificates() {
     try {
-        const response = await fetch(`${apiBaseUrl}/api/certificates`);
+        // Fetch MB and ALP certificates in parallel from SQL-backed endpoints
+        const [mbRes, alpRes] = await Promise.all([
+            fetch(`${apiBaseUrl}/api/mb/certificates`),
+            fetch(`${apiBaseUrl}/api/alp/certificates`),
+        ]);
 
-        if (!response.ok) {
-            const text = await response.text();
-            throw new Error(`API error (${response.status}): ${text || response.statusText}`);
+        if (!mbRes.ok) {
+            const text = await mbRes.text();
+            throw new Error(`API error (${mbRes.status}): ${text || mbRes.statusText}`);
+        }
+        if (!alpRes.ok) {
+            const text = await alpRes.text();
+            throw new Error(`API error (${alpRes.status}): ${text || alpRes.statusText}`);
         }
 
-        return (await response.json()) as CertificateRecord[];
+        const mbList = (await mbRes.json()) as any[];
+        const alpList = (await alpRes.json()) as any[];
+
+        const mapRecord = (item: any, type: 'MB' | 'ALP') => ({
+            id: `${type}-${item.certificateId ?? item.certificateID ?? item.id ?? Math.random()}`,
+            createdAtUtc: (item.createdDate ?? item.createdAtUtc ?? new Date()).toString(),
+            data: { ...item } as Partial<CertificateData>,
+        } as CertificateRecord);
+
+        const combined = [
+            ...mbList.map((i) => mapRecord(i, 'MB')),
+            ...alpList.map((i) => mapRecord(i, 'ALP')),
+        ];
+
+        // sort by createdAtUtc desc
+        combined.sort((a, b) => new Date(b.createdAtUtc).getTime() - new Date(a.createdAtUtc).getTime());
+
+        return combined;
     } catch (error) {
         if (error instanceof Error) {
             throw new Error(`Failed to reach API at ${apiBaseUrl}: ${error.message}`);

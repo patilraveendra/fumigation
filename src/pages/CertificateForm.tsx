@@ -303,30 +303,28 @@ function CertificateForm({ onLogout, onViewSaved, initialType, initialValues }: 
                 </div>
             </div>
 
-            <form onSubmit={(event: FormEvent<HTMLFormElement>) => event.preventDefault()}>
+            <form className="compact-form" onSubmit={(event: FormEvent<HTMLFormElement>) => event.preventDefault()}>
+                {data.certificateType === 'MB' && (
+                    <div className="mb-2">
+                        <h5 className="mb-1">MB Form Creation</h5>
+                    </div>
+                )}
                 <div className="row">
                     <div className="col-12">
                         <div className="card mb-3">
                             <div className="card-header">Certificate Details</div>
                             <div className="card-body">
-                                <div className="row g-3">
-                                    <div className="col-md-4">
-                                        <label className="form-label">Certificate Type</label>
-                                        {initialType === 'MB' ? (
-                                            <div className="form-control-plaintext">MB</div>
-                                        ) : (
-                                            <select name="certificateType" value={data.certificateType} onChange={handleInputChange} className="form-select">
-                                                <option value="MB">MB</option>
-                                                <option value="ALP">ALP</option>
-                                            </select>
-                                        )}
+                                <div className="certificate-inline-row">
+                                    <div className="field-type">
+                                        <label className="form-label mb-0">Certificate Type</label>
+                                        <div className="form-control-plaintext ms-2 mb-0">{data.certificateType}</div>
                                         <input type="hidden" name="certificateType" value={data.certificateType} />
                                     </div>
-                                    <div className="col-md-4">
+                                    <div className="field-number">
                                         <label className="form-label">Certificate Number</label>
                                         <input type="text" name="certificateNumber" value={data.certificateNumber} onChange={handleInputChange} className="form-control" />
                                     </div>
-                                    <div className="col-md-4">
+                                    <div className="field-date">
                                         <label className="form-label">Date Issued</label>
                                         <input type="date" name="dateIssued" value={data.dateIssued} onChange={handleInputChange} className="form-control" />
                                     </div>

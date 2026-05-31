@@ -90,17 +90,18 @@ const MbPrint: React.FC<MbPrintProps> = ({ data }) => {
             >
                 <tbody>
                     <tr>
+                        <td colSpan={4}>
+                            <br /><br /><br /><br /><br /><br /><br />
+                        </td>
+                    </tr>
+                    <tr>
                         <td width="38" rowSpan={7}>
                             <br /><br /><br /><br /><br /><br /><br />
                         </td>
                         <td align="left">
                             <table width="100%" cellPadding={0} cellSpacing={0} style={{ border: '1px solid #666', borderCollapse: 'collapse' }}>
                                 <tbody>
-                                    <tr>
-                                        <td colSpan={2}>
-                                            <br /><br /><br /><br /><br /><br />
-                                        </td>
-                                    </tr>
+
                                     <tr>
                                         <td
                                             width="55%"
