@@ -152,35 +152,7 @@ function SavedCertificates({ onBack, onLogout, initialType }: SavedCertificatesP
                     </div>
                 </div>
 
-                <div className="col-lg-4">
-                    {selectedRecord ? (
-                        <>
-                            <div className="d-flex justify-content-end mb-2">
-                                <button className="btn btn-sm btn-outline-primary" onClick={() => openInPrintTab(selectedRecord)}>Open preview in new tab</button>
-                            </div>
-                            {/* Render the same preview component used by the create/print flow */}
-                            {selectedRecord.data.certificateType === 'ALP' ? (
-                                <AlpPrint data={selectedRecord.data as CertificateData} />
-                            ) : (
-                                <MbPrint data={selectedRecord.data as CertificateData} />
-                            )}
-                            <div className="mt-3">
-                                <button className="btn btn-sm btn-outline-secondary me-2" onClick={() => setShowJson((v) => !v)}>{showJson ? 'Hide' : 'Show'} raw JSON</button>
-                                {showJson ? (
-                                    <div className="card mt-2">
-                                        <div className="card-body p-2" style={{ maxHeight: 300, overflow: 'auto', fontSize: 12 }}>
-                                            <pre style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{JSON.stringify(selectedRecord.data, null, 2)}</pre>
-                                        </div>
-                                    </div>
-                                ) : null}
-                            </div>
-                        </>
-                    ) : (
-                        <div className="card">
-                            <div className="card-body text-muted">Select a certificate to view details here.</div>
-                        </div>
-                    )}
-                </div>
+
             </div>
         </div>
     );

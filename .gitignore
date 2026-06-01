@@ -5,3 +5,4 @@ dist
 bin
 obj
 api/FumigationApi/Data/*.json
+api/FumigationApi/logs/log-20260601.txt
