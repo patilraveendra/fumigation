@@ -57,12 +57,17 @@ function SavedCertificates({ onBack, onLogout, initialType }: SavedCertificatesP
     };
 
     const selectedRecord = records.find((record) => record.id === selectedRecordId);
+    const [showJson, setShowJson] = useState(false);
     const filteredRecords = records.filter((r) => (r.data.certificateType ?? 'MB') === selectedType);
     const navigate = useNavigate();
 
     const openInPrintTab = (record: CertificateRecord) => {
         try {
-            sessionStorage.setItem('printData', JSON.stringify(record.data));
+            // debug: log record metadata and containers so we can confirm shape
+            try { console.debug('openInPrintTab: certificateNumber=', record.data.certificateNumber, 'certificateId=', (record.data as any).certificateId, 'containers=', record.data.containers); } catch { }
+            // write to both sessionStorage and localStorage so new tabs can read it
+            try { sessionStorage.setItem('printData', JSON.stringify(record.data)); } catch { }
+            try { localStorage.setItem('printData', JSON.stringify(record.data)); } catch { }
             window.open('/print', '_blank');
         } catch (e) {
             console.error('Failed to open print tab', e);
@@ -129,13 +134,13 @@ function SavedCertificates({ onBack, onLogout, initialType }: SavedCertificatesP
                                             </tr>
                                         ) : (
                                             filteredRecords.map((record) => (
-                                                <tr key={record.id}>
+                                                <tr key={record.id} style={{ cursor: 'pointer' }} onClick={() => setSelectedRecordId(record.id)}>
                                                     <td>{record.data.certificateNumber ?? '—'}</td>
                                                     <td>{record.data.dateIssued ? new Date(record.data.dateIssued).toLocaleDateString() : '—'}</td>
                                                     <td>{getPartyName(record.data)}</td>
                                                     <td>{record.data.certificateType ?? '—'}</td>
                                                     <td>
-                                                        <button type="button" className="btn btn-sm btn-outline-primary" onClick={() => openInPrintTab(record)}>View</button>
+                                                        <button type="button" className="btn btn-sm btn-outline-primary" onClick={(e) => { e.stopPropagation(); setSelectedRecordId(record.id); openInPrintTab(record); }}>View</button>
                                                     </td>
                                                 </tr>
                                             ))
@@ -159,6 +164,16 @@ function SavedCertificates({ onBack, onLogout, initialType }: SavedCertificatesP
                             ) : (
                                 <MbPrint data={selectedRecord.data as CertificateData} />
                             )}
+                            <div className="mt-3">
+                                <button className="btn btn-sm btn-outline-secondary me-2" onClick={() => setShowJson((v) => !v)}>{showJson ? 'Hide' : 'Show'} raw JSON</button>
+                                {showJson ? (
+                                    <div className="card mt-2">
+                                        <div className="card-body p-2" style={{ maxHeight: 300, overflow: 'auto', fontSize: 12 }}>
+                                            <pre style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{JSON.stringify(selectedRecord.data, null, 2)}</pre>
+                                        </div>
+                                    </div>
+                                ) : null}
+                            </div>
                         </>
                     ) : (
                         <div className="card">

@@ -20,6 +20,11 @@ function formatDate(date?: string) {
     return date;
 }
 
+function isAdditionalFlag(val?: string) {
+    const s = val?.toLowerCase() ?? '';
+    return s.includes('additional') || s.includes('addtional') || s.includes('addit');
+}
+
 const AlpPrint: React.FC<AlpPrintProps> = ({ data }) => {
     const destinationCountry = value(data.destinationCountry, data.tc_country);
     const dosage = value(`${value(data.f_doserate, data.doseRate)} ${value(data.f_dosetype)}`.trim());
@@ -42,7 +47,7 @@ const AlpPrint: React.FC<AlpPrintProps> = ({ data }) => {
     const showContainerRow = containerRows.length > 0 && data.cnoat?.toLowerCase().includes('format');
     const declarationLines = [
         declaration,
-        data.cnoat?.toLowerCase().includes('additional') && containerRows.length > 0
+        isAdditionalFlag(data.cnoat) && containerRows.length > 0
             ? `Container Number (or numerical link) / Seal Number: ${containerRows.join(', ')}`
             : undefined,
     ].filter(Boolean) as string[];
@@ -133,20 +138,21 @@ const AlpPrint: React.FC<AlpPrintProps> = ({ data }) => {
                                                 <tbody>
                                                     <tr>
                                                         <td
-                                                            colSpan={3}
+                                                            colSpan={2}
                                                             rowSpan={2}
                                                             align="left"
                                                             valign="top"
                                                             style={cell('ltrb', { textAlign: 'justify' })}
                                                         >
-                                                            PEST RELIEF (INDIA) PVT. LTD.<br />
-                                                            711/712, 7th floor, commodity exchange building, sector-19, vashi, navi mumbai-400703 (ms)<br />
+                                                            PEST AND SOLUTIONS<br />
+                                                            721, Commodity Exchange Building, Sector 19,
+                                                            Vashi, NAVI MUMBAI-400 703. Maharashtra INDIA.
+
                                                             <strong>
-                                                                Dte PPQS Regd. No :IN-ALP-MUM0015
-                                                                <span style={{ float: 'right' }}>dt: 03-06-2012</span>
+                                                                Dte PPQS Regd. No :IN-ALP-MUM0180  Dt:29-01-2026
                                                             </strong>
                                                         </td>
-                                                        <td width="45%" height="35" colSpan={2} style={cell('tr')}>
+                                                        <td width="50%" height="35" colSpan={2} style={cell('tr')}>
                                                             Treatment Certificate Number :&nbsp; {value(data.certificateNumber)}
                                                         </td>
                                                     </tr>
@@ -224,6 +230,12 @@ const AlpPrint: React.FC<AlpPrintProps> = ({ data }) => {
                                                             {consigneeName}<br />{value(data.c_address)}
                                                         </td>
                                                     </tr>
+                                                    {data.notify ? (
+                                                        <tr>
+                                                            <td height="35" style={goodsLabelCell()}>Notify Party :</td>
+                                                            <td height="35" style={goodsValueCell()}>{value(data.notify)}</td>
+                                                        </tr>
+                                                    ) : null}
                                                     {showContainerRow ? (
                                                         <tr>
                                                             <td height="35" valign="middle" style={goodsLabelCell()}>

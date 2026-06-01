@@ -19,6 +19,11 @@ function cleanValue(value: string | undefined) {
     return value?.trim() || '';
 }
 
+function isAdditionalFlag(val?: string) {
+    const s = val?.toLowerCase() ?? '';
+    return s.includes('additional') || s.includes('addtional') || s.includes('addit');
+}
+
 function quantityText(data: CertificateData) {
     return [data.commodityQuantity, data.netWeight].map(cleanValue).filter(Boolean).join(' / ');
 }
@@ -151,7 +156,7 @@ export async function renderAlpPdf(pdfDoc: PDFDocument, data: CertificateData) {
 
     const containerTextValue = data.cnoat?.toLowerCase().includes('format') ? containerText(data) : '';
     const declarationSource = cleanValue(data.declarationText || data.declaration);
-    const declarationTextValue = data.cnoat?.toLowerCase().includes('additional') && containerText(data)
+    const declarationTextValue = isAdditionalFlag(data.cnoat) && containerText(data)
         ? [declarationSource, containerText(data)].filter(Boolean).join(' ')
         : declarationSource;
     const humiditySource = cleanValue(data.humidity);
@@ -171,6 +176,7 @@ export async function renderAlpPdf(pdfDoc: PDFDocument, data: CertificateData) {
         { text: humidityTextValue, x: 256, top: 289, width: 282, height: 22, offsetY: -4 },
         { text: data.exporterName, x: 256, top: 342, width: 282, height: 44 },
         { text: data.consigneeName, x: 256, top: 387, width: 282, height: 31 },
+        { text: data.notify, x: 256, top: 420, width: 282, height: 12, size: 8, minSize: 6 },
         { text: containerTextValue, x: 256, top: 419, width: 282, height: 18, size: 9, minSize: 6, offsetY: -4 },
         { text: data.commodityDescription, x: 256, top: 439, width: 282, height: 19, offsetY: -5 },
         { text: quantityText(data), x: 256, top: 460, width: 282, height: 35, offsetY: -6 },

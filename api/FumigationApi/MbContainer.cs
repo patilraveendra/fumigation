@@ -123,6 +123,7 @@ public class MbCertificate
     [JsonPropertyName("declaration")] public string? Declaration { get; set; }
     [JsonPropertyName("oremark")] public string? Oremark { get; set; }
     [JsonPropertyName("invoiceno")] public string? Invoiceno { get; set; }
+    [JsonPropertyName("cnoat")] public string? Cnoat { get; set; }
 
     public DateTime CreatedDate { get; set; } = DateTime.Now;
     public DateTime UpdatedDate { get; set; } = DateTime.Now;
@@ -227,6 +228,7 @@ public class AlpCertificate
     [JsonPropertyName("declaration")] public string? Declaration { get; set; }
     [JsonPropertyName("oremark")] public string? Oremark { get; set; }
     [JsonPropertyName("invoiceno")] public string? Invoiceno { get; set; }
+    [JsonPropertyName("cnoat")] public string? Cnoat { get; set; }
 
     public DateTime CreatedDate { get; set; } = DateTime.Now;
     public DateTime UpdatedDate { get; set; } = DateTime.Now;

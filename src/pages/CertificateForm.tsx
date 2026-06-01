@@ -260,8 +260,14 @@ function CertificateForm({ onLogout, onViewSaved, initialType, initialValues }: 
 
     const handleGeneratePdf = async () => {
         setSaveStatus(null);
+        let toSave: CertificateData;
         try {
-            await generateCertificatePdf(data);
+            // Ensure latest container state is used when generating/saving
+            toSave = { ...data, containers } as CertificateData;
+            // sync main data state with containers before actions
+            setData(toSave);
+            console.debug('Saving certificate payload:', toSave);
+            await generateCertificatePdf(toSave);
         } catch (error) {
             const message = error instanceof Error ? error.message : String(error);
             setSaveStatus(`PDF generation failed: ${message}`);
@@ -270,7 +276,8 @@ function CertificateForm({ onLogout, onViewSaved, initialType, initialValues }: 
         }
         setIsSaving(true);
         try {
-            await saveCertificate(data);
+            // use the synced `toSave` payload to ensure latest fields (like cnoat) are persisted
+            await saveCertificate(toSave);
             setSaveStatus('Certificate saved successfully.');
         } catch (error) {
             const message = error instanceof Error ? error.message : 'Unknown error';
@@ -615,7 +622,8 @@ function CertificateForm({ onLogout, onViewSaved, initialType, initialValues }: 
                             </button>
                             <button type="button" className="btn btn-outline-primary" onClick={() => {
                                 try {
-                                    sessionStorage.setItem('printData', JSON.stringify(data));
+                                    try { sessionStorage.setItem('printData', JSON.stringify(data)); } catch { }
+                                    try { localStorage.setItem('printData', JSON.stringify(data)); } catch { }
                                     window.open('/print', '_blank');
                                 } catch (err) {
                                     setSaveStatus('Failed to open print view.');

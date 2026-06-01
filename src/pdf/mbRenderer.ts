@@ -148,6 +148,7 @@ export async function renderMbPdf(pdfDoc: PDFDocument, data: CertificateData) {
         { text: data.temperature, x: 443, top: 262, width: 98, height: 13, offsetY: -4 },
         { text: data.exporterName, x: 269, top: 322, width: 270, height: 42 },
         { text: data.consigneeName, x: 269, top: 365, width: 270, height: 42 },
+        { text: data.notify, x: 269, top: 408, width: 270, height: 12, size: 8, minSize: 6 },
         { text: data.commodityDescription, x: 269, top: 407, width: 270, height: 29, offsetY: -8 },
         { text: quantityText(data), x: 269, top: 437, width: 270, height: 18, offsetY: -4 },
         { text: data.packagingMaterial, x: 269, top: 456, width: 270, height: 20, offsetY: -4 },

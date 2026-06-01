@@ -68,6 +68,7 @@ CREATE TABLE MB_Certificates
     -- Phyto / Non-Phyto
     ContainerNoPlace VARCHAR(100),
     -- CNOAT field
+    Cnoat VARCHAR(100),
     Ct20 VARCHAR(100),
     Ct40 VARCHAR(100),
 
@@ -194,6 +195,7 @@ CREATE TABLE ALP_Certificates
     -- Phyto / Non-Phyto
     ContainerNoPlace VARCHAR(100),
     -- CNOAT field (As Per Format / In Additional Declaration)
+    Cnoat VARCHAR(100),
     FumigationCarriedOutIn VARCHAR(255),
     -- NSPM/ISPM regulation
 

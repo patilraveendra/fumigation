@@ -20,11 +20,27 @@ function formatDate(date?: string) {
     return date;
 }
 
+function isAdditionalFlag(val?: string) {
+    const s = val?.toLowerCase() ?? '';
+    return s.includes('additional') || s.includes('addtional') || s.includes('addit');
+}
+
 const MbPrint: React.FC<MbPrintProps> = ({ data }) => {
     const destinationCountry = value(data.destinationCountry, data.tc_country);
-    const dosage = value(`${value(data.f_doserate, data.doseRate)} ${value(data.f_dosetype)}`.trim());
-    const duration = value(`${value(data.f_duration, data.durationFumigation)} ${value(data.f_hour)}`.trim());
-    const temperature = value(`${value(data.f_temperature, data.temperature)} ${value(data.f_ttype)}`.trim());
+    // Dosage: prefer explicit dose and type; fall back to default unit when missing
+    const doseVal = value(data.f_doserate, data.doseRate);
+    const doseUnit = value(data.f_dosetype);
+    const dosage = doseVal ? `${doseVal}${doseUnit ? ` ${doseUnit}` : ' GRMS /CU.M'}` : '';
+
+    // Duration: prefer explicit duration and hour unit; fall back to HOURS
+    const durVal = value(data.f_duration, data.durationFumigation);
+    const durUnit = value(data.f_hour);
+    const duration = durVal ? `${durVal}${durUnit ? ` ${durUnit}` : ' HOURS'}` : '';
+
+    // Temperature: prefer explicit temperature and unit; fall back to DEG. CELSIUS
+    const tempVal = value(data.f_temperature, data.temperature);
+    const tempUnit = value(data.f_ttype);
+    const temperature = tempVal ? `${tempVal}${tempUnit ? ` ${tempUnit}` : ' DEG. CELSIUS'}` : '';
     const exporterName = value(data.d_name, data.exporterName);
     const consigneeName = value(data.c_name, data.consigneeName);
     const quantity = value(data.quantityDeclared, data.commodityQuantity, data.noOfQuantity);
@@ -32,7 +48,23 @@ const MbPrint: React.FC<MbPrintProps> = ({ data }) => {
     const shippingMark = value(data.shippingMark, data.l_ship, '.');
     const invoice = value(data.invoiceno, [data.invoiceNumber, formatDate(data.invoiceDate)].filter(Boolean).join(' dated '));
     const declaration = value(data.declaration, data.declarationText);
-    const showContainerRow = data.cnoat?.toLowerCase().includes('format') && data.containers && data.containers.length > 0;
+    const fcoi = value(data.fcoi);
+
+    let additionalDeclarationText = declaration || '';
+    if (fcoi) {
+        const fc = fcoi.toLowerCase();
+        if (fc.includes('nspm 12 and ispm 15')) {
+            additionalDeclarationText = 'I declare that these details are true & correct and the fumigation has been carried out in accordance with NSPM 12 and ISPM 15 regulations of IPPC.';
+        } else if (fc.includes('nspm 12')) {
+            additionalDeclarationText = 'I declare that these details are true & correct and the fumigation has been carried out in accordance with the NSPM 12 standards.';
+        }
+    }
+    const hasContainers = (data.containers ?? []).length > 0;
+    const cnoat = (data.cnoat ?? '').toString().toLowerCase();
+    // Strict behavior: when dropdown indicates 'format' show in container row;
+    // when dropdown indicates 'additional' show in Additional Declaration.
+    const showContainerRow = cnoat.includes('format') && hasContainers;
+    const showContainersInDeclaration = isAdditionalFlag(cnoat) && hasContainers;
 
     const td: React.CSSProperties = {
         fontFamily: 'Arial, Helvetica, sans-serif',
@@ -104,27 +136,28 @@ const MbPrint: React.FC<MbPrintProps> = ({ data }) => {
 
                                     <tr>
                                         <td
-                                            width="55%"
+                                            width="50%"
                                             rowSpan={2}
                                             valign="top"
                                             align="left"
                                             style={cell('ltrb', { textAlign: 'justify' })}
                                         >
-                                            PEST RELIEF (INDIA) PVT. LTD.<br />
-                                            711, 712 Commodity Exchange Building, sector 19,<br />
-                                            vashi, NAVI MUMBAI-400 703. Maharashtra INDIA.
+                                            PEST AND SOLUTIONS<br />
+                                            721, Commodity Exchange Building, Sector 19,
+                                            Vashi, Navi Mumbai-400 703. Maharashtra, India.
+
                                             <br />
                                             <strong>
-                                                Dte. PPQS Regn. No. :MB/343
-                                                <span style={{ float: 'right' }}>DT: 27-07-2010</span>
+                                                Dte PPQS Regd. No : IN-MB-MUM1131 Dt: 29-01-2026
+
                                             </strong>
                                         </td>
-                                        <td width="45%" height="20" style={cell('tr')}>
+                                        <td width="50%" height="20" style={cell('tr')}>
                                             <strong>Treatment Certificate Number :&nbsp; {value(data.certificateNumber)}</strong>
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td width="45%" height="20" style={cell('trb')}>
+                                        <td width="50%" height="20" style={cell('trb')}>
                                             <strong>Date of Issue :&nbsp;{formatDate(value(data.dateIssued))}</strong>
                                         </td>
                                     </tr>
@@ -235,6 +268,12 @@ const MbPrint: React.FC<MbPrintProps> = ({ data }) => {
                                             {consigneeName}<br />{value(data.c_address)}
                                         </td>
                                     </tr>
+                                    {data.notify ? (
+                                        <tr>
+                                            <td style={cell('lbr')}>Notify Party</td>
+                                            <td style={cell('br')}>{value(data.notify)}</td>
+                                        </tr>
+                                    ) : null}
                                     {invoice ? (
                                         <tr>
                                             <td style={cell('lbr')}>&nbsp;INVOICE NO. AND DATE</td>
@@ -251,12 +290,24 @@ const MbPrint: React.FC<MbPrintProps> = ({ data }) => {
                                 <tbody>
                                     <tr>
                                         <td style={cell('')}>
-                                            <strong><u>&nbsp;Additional Declaration</u></strong> : {declaration}
+                                            <strong><u>&nbsp;Additional Declaration</u></strong> : {additionalDeclarationText}
                                         </td>
                                     </tr>
                                     <tr>
                                         <td style={cell('', { fontSize: 9 })}>
                                             &nbsp;I declare that these details are true &amp; correct and the fumigation has been carried out in accordence with the NSPM 12 standards.
+                                            {showContainersInDeclaration ? (
+                                                <div style={{ marginTop: 8 }}>
+                                                    <strong>Container Numbers/Seals:</strong>
+                                                    <div>
+                                                        {data.containers?.map((c, idx) => (
+                                                            <div key={`decl-cont-${idx}`}>
+                                                                {c.cont}{c.seal ? ` / ${c.seal}` : ''}
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            ) : null}
                                         </td>
                                     </tr>
                                 </tbody>

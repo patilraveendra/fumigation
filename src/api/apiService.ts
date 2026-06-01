@@ -74,6 +74,31 @@ export async function fetchCertificates() {
         const mbList = (await mbRes.json()) as any[];
         const alpList = (await alpRes.json()) as any[];
 
+        // Debug log the raw API responses for troubleshooting
+        console.debug('fetchCertificates: mbList sample', mbList?.slice?.(0, 2));
+        console.debug('fetchCertificates: alpList sample', alpList?.slice?.(0, 2));
+
+        // Normalize container object keys so frontend print components can rely on { cont, seal }
+        const normalizeContainers = (record: any) => {
+            if (!record) return record;
+            // Support both camelCase `containers` and Pascal `Containers` coming from different serializers
+            const raw = record.containers ?? record.Containers ?? null;
+            if (!raw) return record;
+            try {
+                record.containers = raw.map((c: any) => ({
+                    cont: c.cont ?? c.containerNumber ?? c.ContainerNumber ?? c.ContainerNo ?? c.Container ?? '',
+                    seal: c.seal ?? c.sealNumber ?? c.SealNumber ?? c.SealNo ?? c.Seal ?? '',
+                }));
+            } catch (e) {
+                console.debug('normalizeContainers: failed to normalize containers for record', record, e);
+                record.containers = [];
+            }
+            return record;
+        };
+
+        mbList.forEach(normalizeContainers);
+        alpList.forEach(normalizeContainers);
+
         const mapRecord = (item: any, type: 'MB' | 'ALP') => ({
             id: `${type}-${item.certificateId ?? item.certificateID ?? item.id ?? Math.random()}`,
             createdAtUtc: (item.createdDate ?? item.createdAtUtc ?? new Date()).toString(),

@@ -8,7 +8,10 @@ const PrintCertificate: React.FC = () => {
 
     useEffect(() => {
         try {
-            const raw = sessionStorage.getItem('printData');
+            // Prefer sessionStorage (from same-tab flows) but fall back to localStorage (used when opening new tab)
+            const rawSession = sessionStorage.getItem('printData');
+            const rawLocal = localStorage.getItem('printData');
+            const raw = rawSession ?? rawLocal;
             if (!raw) return;
             const parsed = JSON.parse(raw) as CertificateData;
             setData(parsed);
