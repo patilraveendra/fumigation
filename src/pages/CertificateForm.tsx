@@ -318,7 +318,7 @@ function CertificateForm({ onLogout, onViewSaved, initialType, initialValues }: 
                 )}
                 <div className="row">
                     <div className="col-12">
-                        <div className="card mb-3">
+                        <div className="card mb-3 two-column">
                             <div className="card-header">Certificate Details</div>
                             <div className="card-body">
                                 <div className="certificate-inline-row">
@@ -338,263 +338,129 @@ function CertificateForm({ onLogout, onViewSaved, initialType, initialValues }: 
                                 </div>
                             </div>
                         </div>
-                        <div className="card mb-3">
+                        <div className="card mb-3 two-column">
                             <div className="card-header">Client / Shipment Details</div>
                             <div className="card-body">
-                                <div className="row g-3 mb-2">
-                                    <div className="col-md-4">
-                                        <label className="form-label">Country</label>
-                                        <input type="text" name="tc_country" value={data.tc_country} onChange={handleInputChange} className="form-control" />
-                                    </div>
-                                    <div className="col-md-4">
-                                        <label className="form-label">No Of Quantity</label>
-                                        <input type="number" name="noOfQuantity" value={data.noOfQuantity} onChange={handleInputChange} className="form-control" />
-                                    </div>
-                                    <div className="col-md-4">
-                                        <label className="form-label">Work Order</label>
-                                        <div>
-                                            <button type="button" className="btn btn-outline-secondary">Select / Edit</button>
+                                <div>
+                                    <div className="row g-3 mb-2">
+                                        <div className="col-md-6">
+                                            <label className="form-label">Country</label>
+                                            <input type="text" name="tc_country" value={data.tc_country} onChange={handleInputChange} className="form-control" />
+                                        </div>
+                                        <div className="col-md-6">
+                                            <label className="form-label">No Of Quantity</label>
+                                            <input type="number" name="noOfQuantity" value={data.noOfQuantity} onChange={handleInputChange} className="form-control" />
                                         </div>
                                     </div>
-                                </div>
 
-                                <div className="row g-3 mb-2">
-                                    <div className="col-md-4">
-                                        <label className="form-label">Exporter Name</label>
-                                        <input type="text" name="exporterName" value={data.exporterName} onChange={handleInputChange} className="form-control" />
-                                    </div>
-                                    <div className="col-md-4">
-                                        <label className="form-label">Consignee Name</label>
-                                        <input type="text" name="consigneeName" value={data.consigneeName} onChange={handleInputChange} className="form-control" />
-                                    </div>
-                                    <div className="col-md-4">
-                                        <label className="form-label">Type and Description of Cargo</label>
-                                        <input type="text" name="commodityDescription" value={data.commodityDescription} onChange={handleInputChange} className="form-control" />
-                                    </div>
-                                </div>
-
-                                <div className="row g-3 mb-2">
-                                    <div className="col-md-6">
-                                        <label className="form-label">Exporter Invoice No &amp; Date</label>
-                                        <input type="text" name="invoiceno" value={data.invoiceno} onChange={handleInputChange} className="form-control" />
-                                    </div>
-                                    <div className="col-md-6">
-                                        <label className="form-label">Exporter Address</label>
-                                        <textarea name="d_address" value={data.d_address} onChange={handleInputChange} className="form-control" rows={3} />
-                                    </div>
-                                </div>
-
-                                <div className="row g-3 mb-2">
-                                    <div className="col-md-12">
-                                        <label className="form-label">Address of Consignee</label>
-                                        <textarea name="c_address" value={data.c_address} onChange={handleInputChange} className="form-control" rows={3} />
-                                    </div>
-                                </div>
-
-                                <div className="row g-3 mb-2">
-                                    <div className="col-md-12">
-                                        <label className="form-label">NOTIFY PARTY</label>
-                                        <textarea name="notify" value={data.notify} onChange={handleInputChange} className="form-control" rows={2} />
-                                    </div>
-                                </div>
-
-                                <div className="row g-3">
-                                    <div className="col-md-3">
-                                        <label className="form-label">Commodity Quantity</label>
-                                        <input type="text" name="commodityQuantity" value={data.commodityQuantity} onChange={handleInputChange} className="form-control" />
-                                    </div>
-                                    <div className="col-md-3">
-                                        <label className="form-label">Net Weight</label>
-                                        <input type="text" name="netWeight" value={data.netWeight} onChange={handleInputChange} className="form-control" />
-                                    </div>
-                                    <div className="col-md-3">
-                                        <label className="form-label">Packaging Material</label>
-                                        <input type="text" name="packagingMaterial" value={data.packagingMaterial} onChange={handleInputChange} className="form-control" />
-                                    </div>
-                                    <div className="col-md-3">
-                                        <label className="form-label">Shipping Mark / Brand</label>
-                                        <input type="text" name="shippingMark" value={data.shippingMark} onChange={handleInputChange} className="form-control" />
-                                    </div>
-                                </div>
-
-
-                                <div className="row g-3 mt-3">
-                                    <div className="col-md-12">
-                                        <label className="form-label">Quantity Declared</label>
-                                        <textarea name="quantityDeclared" value={data.quantityDeclared} onChange={handleInputChange} className="form-control" rows={4} />
-                                    </div>
-                                </div>
-
-                                <div className="row g-3 mb-2 align-items-end mt-3">
-                                    <div className="col-md-6">
-                                        <label className="form-label">Container Types</label>
-                                        <div className="d-flex gap-2">
-                                            <div style={{ minWidth: 160 }}>
-                                                <label className="form-label small">20' X</label>
-                                                <select name="ct20" value={data.ct20} onChange={handleInputChange} className="form-select">
-                                                    <option value="">Select When Required</option>
-                                                    <option value="FCL">FCL</option>
-                                                    <option value="LCL">LCL</option>
-                                                </select>
-                                            </div>
-                                            <div style={{ minWidth: 160 }}>
-                                                <label className="form-label small">40' X</label>
-                                                <select name="ct40" value={data.ct40} onChange={handleInputChange} className="form-select">
-                                                    <option value="">Select When Required</option>
-                                                    <option value="FCL">FCL</option>
-                                                    <option value="LCL">LCL</option>
-                                                    <option value="HC">HC</option>
-                                                </select>
+                                    <div className="row g-3 mb-2">
+                                        <div className="col-md-12">
+                                            <label className="form-label">Work Order</label>
+                                            <div>
+                                                <button type="button" className="btn btn-outline-secondary">Select / Edit</button>
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="col-md-6 text-end">
-                                        <label className="form-label">Container No / Seal No</label>
-                                        <div>
-                                            <button type="button" className="btn btn-info btn-sm" onClick={addContainer}>Add Container</button>
+
+                                    {/*    <div className="row g-3 mb-2">
+                                        <div className="col-md-4">
+                                            <label className="form-label">Commodity Quantity</label>
+                                            <input type="text" name="commodityQuantity" value={data.commodityQuantity} onChange={handleInputChange} className="form-control" />
                                         </div>
-                                    </div>
+                                        <div className="col-md-4">
+                                            <label className="form-label">Packaging Material</label>
+                                            <input type="text" name="packagingMaterial" value={data.packagingMaterial} onChange={handleInputChange} className="form-control" />
+                                        </div>
+                                        <div className="col-md-4">
+                                            <label className="form-label">Shipping Mark / Brand</label>
+                                            <input type="text" name="shippingMark" value={data.shippingMark} onChange={handleInputChange} className="form-control" />
+                                        </div>
+                                    </div> */}
                                 </div>
 
-                                <div className="mb-3">
-                                    {containers.map((c, idx) => (
-                                        <div key={idx} className="d-flex gap-2 align-items-center mb-2">
-                                            <input placeholder="Container No" value={c.cont || ''} onChange={(e) => updateContainer(idx, 'cont', e.target.value)} className="form-control" style={{ maxWidth: 220 }} />
-                                            <input placeholder="Seal No" value={c.seal || ''} onChange={(e) => updateContainer(idx, 'seal', e.target.value)} className="form-control" style={{ maxWidth: 140 }} />
-                                            <button type="button" className="btn btn-sm btn-danger" onClick={() => removeContainer(idx)}>Delete</button>
+                                <div>
+                                    <div className="row g-3 mb-2">
+                                        <div className="col-md-12">
+                                            <label className="form-label">Exporter Name</label>
+                                            <input type="text" name="exporterName" value={data.exporterName} onChange={handleInputChange} className="form-control" />
                                         </div>
-                                    ))}
+                                        <div className="col-md-12 mt-2">
+                                            <label className="form-label">Exporter Address</label>
+                                            <textarea name="d_address" value={data.d_address} onChange={handleInputChange} className="form-control" rows={3} />
+                                        </div>
+                                        <div className="col-md-12 mt-2">
+                                            <label className="form-label">Exporter Invoice No &amp; Date</label>
+                                            <input type="text" name="invoiceno" value={data.invoiceno} onChange={handleInputChange} className="form-control" />
+                                        </div>
+                                        <div className="col-md-12 mt-2">
+                                            <label className="form-label">Consignee Name</label>
+                                            <input type="text" name="consigneeName" value={data.consigneeName} onChange={handleInputChange} className="form-control" />
+                                        </div>
+                                        <div className="col-md-12 mt-2">
+                                            <label className="form-label">Address of Consignee</label>
+                                            <textarea name="c_address" value={data.c_address} onChange={handleInputChange} className="form-control" rows={3} />
+                                        </div>
+                                        <div className="col-md-12 mt-2">
+                                            <label className="form-label">NOTIFY PARTY</label>
+                                            <textarea name="notify" value={data.notify} onChange={handleInputChange} className="form-control" rows={2} />
+                                        </div>
+                                        <div className="col-md-12 mt-2">
+                                            <label className="form-label">Type and Description of Cargo</label>
+                                            <input type="text" name="commodityDescription" value={data.commodityDescription} onChange={handleInputChange} className="form-control" />
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div className="card mb-3">
-                            <div className="card-header">Treatment Details</div>
-                            <div className="card-body">
-                                <div className="row g-3">
-                                    <div className="col-md-4">
-                                        <label className="form-label">Name of Fumigation</label>
-                                        <select name="f_type" value={data.f_type} onChange={handleInputChange} className="form-select">
-                                            {(isMb ? mbFumigantOptions : alpFumigantOptions).map((option, index) => (
-                                                <option key={`${option}-${index}`} value={option}>{option}</option>
-                                            ))}
-                                        </select>
-                                    </div>
-                                    <div className="col-md-4">
-                                        <label className="form-label">Place of Fumigation</label>
-                                        <input type="text" name="placeOfFumigation" value={data.placeOfFumigation} onChange={handleInputChange} className="form-control" />
-                                    </div>
-                                    <div className="col-md-4">
-                                        <label className="form-label">Dosage rate of Fumigation</label>
-                                        <div className="d-flex gap-2">
-                                            <input type="text" name="f_doserate" value={data.f_doserate} onChange={handleInputChange} className="form-control" />
-                                            <select name="f_dosetype" value={data.f_dosetype} onChange={handleInputChange} className="form-select" style={{ maxWidth: 160 }}>
-                                                {(isMb ? mbDosageTypeOptions : alpDosageTypeOptions).map((option, index) => (
-                                                    <option key={`${option.value}-${index}`} value={option.value}>{option.label}</option>
-                                                ))}
+
+                            <div className="row g-3">
+                                <div className="col-md-4">
+                                    <label className="form-label">Commodity Quantity</label>
+                                    <input type="text" name="commodityQuantity" value={data.commodityQuantity} onChange={handleInputChange} className="form-control" />
+                                </div>
+                                <div className="col-md-4">
+                                    <label className="form-label">Packaging Material</label>
+                                    <input type="text" name="packagingMaterial" value={data.packagingMaterial} onChange={handleInputChange} className="form-control" />
+                                </div>
+                                <div className="col-md-4">
+                                    <label className="form-label">Shipping Mark / Brand</label>
+                                    <input type="text" name="shippingMark" value={data.shippingMark} onChange={handleInputChange} className="form-control" />
+                                </div>
+                            </div>
+
+
+                            <div className="row g-3 mt-3">
+                                <div className="col-md-12">
+                                    <label className="form-label">Quantity Declared</label>
+                                    <textarea name="quantityDeclared" value={data.quantityDeclared} onChange={handleInputChange} className="form-control" rows={4} />
+                                </div>
+                            </div>
+
+                            <div className="row g-3 mb-2 align-items-end mt-3">
+                                <div className="col-md-6">
+                                    <label className="form-label">Container Types</label>
+                                    <div className="d-flex gap-2">
+                                        <div style={{ minWidth: 160 }}>
+                                            <label className="form-label small">20' X</label>
+                                            <select name="ct20" value={data.ct20} onChange={handleInputChange} className="form-select">
+                                                <option value="">Select When Required</option>
+                                                <option value="FCL">FCL</option>
+                                                <option value="LCL">LCL</option>
+                                            </select>
+                                        </div>
+                                        <div style={{ minWidth: 160 }}>
+                                            <label className="form-label small">40' X</label>
+                                            <select name="ct40" value={data.ct40} onChange={handleInputChange} className="form-select">
+                                                <option value="">Select When Required</option>
+                                                <option value="FCL">FCL</option>
+                                                <option value="LCL">LCL</option>
+                                                <option value="HC">HC</option>
                                             </select>
                                         </div>
                                     </div>
-                                </div>
-                                <div className="row g-3 mt-2">
-                                    <div className="col-md-4">
-                                        <label className="form-label">Duration of Fumigation</label>
-                                        {isMb ? (
-                                            <div className="d-flex gap-2">
-                                                <input type="text" name="f_duration" value={data.f_duration || data.durationFumigation} onChange={handleInputChange} className="form-control" />
-                                                <select name="f_hour" value={data.f_hour} onChange={handleInputChange} className="form-select" style={{ maxWidth: 120 }}>
-                                                    {mbDurationUnitOptions.map((option) => (
-                                                        <option key={option.value} value={option.value}>{option.label}</option>
-                                                    ))}
-                                                </select>
-                                            </div>
-                                        ) : (
-                                            <div className="d-flex gap-2 align-items-center">
-                                                <input type="text" name="f_duration_days" value={data.f_duration_days} onChange={handleInputChange} className="form-control" />
-                                                <span>Days</span>
-                                                <input type="text" name="f_duration_hours" value={data.f_duration_hours} onChange={handleInputChange} className="form-control" />
-                                                <span>Hours</span>
-                                            </div>
-                                        )}
-                                    </div>
-                                    <div className="col-md-4">
-                                        {isMb ? (
-                                            <>
-                                                <label className="form-label">Minimum air temperature</label>
-                                                <div className="d-flex gap-2">
-                                                    <input type="text" name="f_temperature" value={data.f_temperature || data.temperature} onChange={handleInputChange} className="form-control" />
-                                                    <select name="f_ttype" value={data.f_ttype} onChange={handleInputChange} className="form-select" style={{ maxWidth: 160 }}>
-                                                        <option value="DEG. CELSIUS">DEG. CELSIUS</option>
-                                                        <option value="DEG. CELSIUS">DEG. CELSIUS</option>
-                                                    </select>
-                                                </div>
-                                            </>
-                                        ) : (
-                                            <>
-                                                <label className="form-label">Average Ambient Humidity</label>
-                                                <div className="d-flex gap-2 align-items-center">
-                                                    <input type="text" name="humidity" value={data.humidity} onChange={handleInputChange} className="form-control" style={{ maxWidth: 120 }} />
-                                                    <span>%</span>
-                                                    <input type="text" name="temperature" value={data.temperature} onChange={handleInputChange} className="form-control" style={{ maxWidth: 100 }} />
-                                                    <span>°C</span>
-                                                </div>
-                                            </>
-                                        )}
-                                    </div>
-                                    <div className="col-md-4">
-                                        <label className="form-label">Date of Fumigation</label>
-                                        <input type="date" name="f_date" value={data.f_date || data.fumigationStarted} onChange={handleInputChange} className="form-control" />
-                                    </div>
-                                </div>
-                                <div className="row g-3 mt-3">
-                                    <div className="col-md-4">
-                                        <label className="form-label">Fumigation Performed Under gastight sheets</label>
-                                        <select name="f_performed" value={data.f_performed} onChange={handleInputChange} className="form-select">
-                                            <option value="Yes">Yes</option>
-                                            <option value="No">No</option>
-                                        </select>
-                                    </div>
-                                    <div className="col-md-4">
-                                        <label className="form-label">Container has 200mm free air space at top of container</label>
-                                        <select name="f_airspace" value={data.f_airspace} onChange={handleInputChange} className="form-select">
-                                            <option value="N/A">N/A</option>
-                                            <option value="Yes">Yes</option>
-                                            <option value="No">No</option>
-                                        </select>
-                                    </div>
-                                    <div className="col-md-4">
-                                        <label className="form-label">Fumigation Carried Out In</label>
-                                        <select name="fcoi" value={data.fcoi} onChange={handleInputChange} className="form-select">
-                                            <option value="NSPM 12 AND ISPM 15 REGULATION OF IPPC">NSPM 12 AND ISPM 15 REGULATION OF IPPC</option>
-                                            <option value="NSPM 12">NSPM 12</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="card mb-3">
-                            <div className="card-header">Operator Details</div>
-                            <div className="card-body">
-                                <div className="mb-3">
-                                    <label className="form-label">Fumigator Name / Accreditation Number</label>
-                                    <input type="text" name="fumigatorName" value={data.fumigatorName} onChange={handleInputChange} className="form-control" />
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="card mb-3">
-                            <div className="card-header">Additional Information</div>
-                            <div className="card-body">
-                                <div className="row g-3 mb-3">
-                                    <div className="col-md-6">
-                                        <label className="form-label">Category</label>
-                                        <select name="phnph" value={data.phnph} onChange={handleInputChange} className="form-select">
-                                            <option value="Non-Phyto">Non-Phyto</option>
-                                            <option value="Phyto">Phyto</option>
-                                        </select>
-                                    </div>
-                                    <div className="col-md-6">
-                                        <label className="form-label">Container No. Place</label>
+                                    <div className="mt-2">
+                                        <label className="form-label small">Container No. Place</label>
                                         <select name="cnoat" value={data.cnoat} onChange={handleInputChange} className="form-select">
+                                            <option value=""></option>
                                             <option value="In Additional Declaration">In Additional Declaration</option>
                                             <option value="As Per Format">As Per Format</option>
                                             <option value="In Additional Declaration - Attachment">In Additional Declaration - Attachment</option>
@@ -604,39 +470,193 @@ function CertificateForm({ onLogout, onViewSaved, initialType, initialValues }: 
                                         </select>
                                     </div>
                                 </div>
-
-                                <div className="mb-3">
-                                    <label className="form-label">Additional Declaration</label>
-                                    <textarea name="declaration" value={data.declaration} onChange={handleInputChange} className="form-control" rows={4} />
-                                </div>
-
-                                <div className="mb-3">
-                                    <label className="form-label">Office Remark</label>
-                                    <textarea name="oremark" value={data.oremark} onChange={handleInputChange} className="form-control" rows={3} />
+                                <div className="col-md-6">
+                                    <label className="form-label">Container No / Seal No</label>
+                                    <div>
+                                        <button type="button" className="btn btn-info btn-sm" onClick={addContainer}>Add Container</button>
+                                    </div>
+                                    <div className="mt-2">
+                                        {containers.map((c, idx) => (
+                                            <div key={idx} className="d-flex gap-2 align-items-center mb-2">
+                                                <input placeholder="Container No" value={c.cont || ''} onChange={(e) => updateContainer(idx, 'cont', e.target.value)} className="form-control" style={{ maxWidth: 220 }} />
+                                                <input placeholder="Seal No" value={c.seal || ''} onChange={(e) => updateContainer(idx, 'seal', e.target.value)} className="form-control" style={{ maxWidth: 140 }} />
+                                                <button type="button" className="btn btn-sm btn-danger" onClick={() => removeContainer(idx)}>Delete</button>
+                                            </div>
+                                        ))}
+                                    </div>
                                 </div>
                             </div>
+
+
                         </div>
-                        <div className="d-flex gap-2 justify-content-end mb-4">
-                            <button type="button" className="btn btn-success" onClick={handleGeneratePdf} disabled={isSaving}>
-                                {isSaving ? 'Saving…' : 'Generate & Save'}
-                            </button>
-                            <button type="button" className="btn btn-outline-primary" onClick={() => {
-                                try {
-                                    try { sessionStorage.setItem('printData', JSON.stringify(data)); } catch { }
-                                    try { localStorage.setItem('printData', JSON.stringify(data)); } catch { }
-                                    window.open('/print', '_blank');
-                                } catch (err) {
-                                    setSaveStatus('Failed to open print view.');
-                                }
-                            }}>Open Print View</button>
-                            <button type="button" className="btn btn-outline-secondary" onClick={() => (onViewSaved ? onViewSaved() : navigate('/list'))}>View saved certificates</button>
-                        </div>
-                        {saveStatus ? (
-                            <div className="form-status">
-                                <p>{saveStatus}</p>
-                            </div>
-                        ) : null}
                     </div>
+                    <div className="card mb-3">
+                        <div className="card-header">Treatment Details</div>
+                        <div className="card-body">
+                            <div className="row g-3">
+                                <div className="col-md-4">
+                                    <label className="form-label">Name of Fumigation</label>
+                                    <select name="f_type" value={data.f_type} onChange={handleInputChange} className="form-select">
+                                        <option value=""></option>
+                                        {(isMb ? mbFumigantOptions : alpFumigantOptions).map((option, index) => (
+                                            <option key={`${option}-${index}`} value={option}>{option}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div className="col-md-4">
+                                    <label className="form-label">Place of Fumigation</label>
+                                    <input type="text" name="placeOfFumigation" value={data.placeOfFumigation} onChange={handleInputChange} className="form-control" />
+                                </div>
+                                <div className="col-md-4">
+                                    <label className="form-label">Dosage rate of Fumigation</label>
+                                    <div className="d-flex gap-2">
+                                        <input type="text" name="f_doserate" value={data.f_doserate} onChange={handleInputChange} className="form-control" />
+                                        <select name="f_dosetype" value={data.f_dosetype} onChange={handleInputChange} className="form-select" style={{ maxWidth: 160 }}>
+                                            <option value=""></option>
+                                            {(isMb ? mbDosageTypeOptions : alpDosageTypeOptions).map((option, index) => (
+                                                <option key={`${option.value}-${index}`} value={option.value}>{option.label}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="row g-3 mt-2">
+                                <div className="col-md-4">
+                                    <label className="form-label">Duration of Fumigation</label>
+                                    {isMb ? (
+                                        <div className="d-flex gap-2">
+                                            <input type="text" name="f_duration" value={data.f_duration || data.durationFumigation} onChange={handleInputChange} className="form-control" />
+                                            <select name="f_hour" value={data.f_hour} onChange={handleInputChange} className="form-select" style={{ maxWidth: 120 }}>
+                                                <option value=""></option>
+                                                {mbDurationUnitOptions.map((option) => (
+                                                    <option key={option.value} value={option.value}>{option.label}</option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                    ) : (
+                                        <div className="d-flex gap-2 align-items-center">
+                                            <input type="text" name="f_duration_days" value={data.f_duration_days} onChange={handleInputChange} className="form-control" />
+                                            <span>Days</span>
+                                            <input type="text" name="f_duration_hours" value={data.f_duration_hours} onChange={handleInputChange} className="form-control" />
+                                            <span>Hours</span>
+                                        </div>
+                                    )}
+                                </div>
+                                <div className="col-md-4">
+                                    {isMb ? (
+                                        <>
+                                            <label className="form-label">Minimum air temperature</label>
+                                            <div className="d-flex gap-2">
+                                                <input type="text" name="f_temperature" value={data.f_temperature || data.temperature} onChange={handleInputChange} className="form-control" />
+                                                <select name="f_ttype" value={data.f_ttype} onChange={handleInputChange} className="form-select" style={{ maxWidth: 160 }}>
+                                                    <option value=""></option>
+                                                    <option value="DEG. CELSIUS">DEG. CELSIUS</option>
+                                                    <option value="DEG. CELSIUS">DEG. CELSIUS</option>
+                                                </select>
+                                            </div>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <label className="form-label">Average Ambient Humidity</label>
+                                            <div className="d-flex gap-2 align-items-center">
+                                                <input type="text" name="humidity" value={data.humidity} onChange={handleInputChange} className="form-control" style={{ maxWidth: 120 }} />
+                                                <span>%</span>
+                                                <input type="text" name="temperature" value={data.temperature} onChange={handleInputChange} className="form-control" style={{ maxWidth: 100 }} />
+                                                <span>°C</span>
+                                            </div>
+                                        </>
+                                    )}
+                                </div>
+                                <div className="col-md-4">
+                                    <label className="form-label">Date of Fumigation</label>
+                                    <input type="date" name="f_date" value={data.f_date || data.fumigationStarted} onChange={handleInputChange} className="form-control" />
+                                </div>
+                            </div>
+                            <div className="row g-3 mt-3">
+                                <div className="col-md-4">
+                                    <label className="form-label">Fumigation Performed Under gastight sheets</label>
+                                    <select name="f_performed" value={data.f_performed} onChange={handleInputChange} className="form-select">
+                                        <option value=""></option>
+                                        <option value="Yes">Yes</option>
+                                        <option value="No">No</option>
+                                    </select>
+                                </div>
+                                <div className="col-md-4">
+                                    <label className="form-label">Container has 200mm free air space at top of container</label>
+                                    <select name="f_airspace" value={data.f_airspace} onChange={handleInputChange} className="form-select">
+                                        <option value=""></option>
+                                        <option value="N/A">N/A</option>
+                                        <option value="Yes">Yes</option>
+                                        <option value="No">No</option>
+                                    </select>
+                                </div>
+                                <div className="col-md-4">
+                                    <label className="form-label">Fumigation Carried Out In</label>
+                                    <select name="fcoi" value={data.fcoi} onChange={handleInputChange} className="form-select">
+                                        <option value=""></option>
+                                        <option value="NSPM 12 AND ISPM 15 REGULATION OF IPPC">NSPM 12 AND ISPM 15 REGULATION OF IPPC</option>
+                                        <option value="NSPM 12">NSPM 12</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="card mb-3">
+                        <div className="card-header">Operator Details</div>
+                        <div className="card-body">
+                            <div className="mb-3">
+                                <label className="form-label">Fumigator Name / Accreditation Number</label>
+                                <input type="text" name="fumigatorName" value={data.fumigatorName} onChange={handleInputChange} className="form-control" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="card mb-3">
+                        <div className="card-header">Additional Information</div>
+                        <div className="card-body">
+                            <div className="row g-3 mb-3">
+                                <div className="col-md-6">
+                                    <label className="form-label">Category</label>
+                                    <select name="phnph" value={data.phnph} onChange={handleInputChange} className="form-select">
+                                        <option value=""></option>
+                                        <option value="Non-Phyto">Non-Phyto</option>
+                                        <option value="Phyto">Phyto</option>
+                                    </select>
+                                </div>
+
+                            </div>
+
+                            <div className="mb-3">
+                                <label className="form-label">Additional Declaration</label>
+                                <textarea name="declaration" value={data.declaration} onChange={handleInputChange} className="form-control" rows={4} />
+                            </div>
+
+                            <div className="mb-3">
+                                <label className="form-label">Office Remark</label>
+                                <textarea name="oremark" value={data.oremark} onChange={handleInputChange} className="form-control" rows={3} />
+                            </div>
+                        </div>
+                    </div>
+                    <div className="d-flex gap-2 justify-content-end mb-4">
+                        <button type="button" className="btn btn-success" onClick={handleGeneratePdf} disabled={isSaving}>
+                            {isSaving ? 'Saving…' : 'Generate & Save'}
+                        </button>
+                        <button type="button" className="btn btn-outline-primary" onClick={() => {
+                            try {
+                                try { sessionStorage.setItem('printData', JSON.stringify(data)); } catch { }
+                                try { localStorage.setItem('printData', JSON.stringify(data)); } catch { }
+                                window.open('/print', '_blank');
+                            } catch (err) {
+                                setSaveStatus('Failed to open print view.');
+                            }
+                        }}>Open Print View</button>
+                        <button type="button" className="btn btn-outline-secondary" onClick={() => (onViewSaved ? onViewSaved() : navigate('/list'))}>View saved certificates</button>
+                    </div>
+                    {saveStatus ? (
+                        <div className="form-status">
+                            <p>{saveStatus}</p>
+                        </div>
+                    ) : null}
                 </div>
             </form>
         </div>

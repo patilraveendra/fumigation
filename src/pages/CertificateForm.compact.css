@@ -2,13 +2,13 @@
     background: #fff;
     border: 1px solid #e0e0e0;
     border-radius: 6px;
-    padding: 10px 10px 6px 10px;
-    margin-bottom: 12px;
+    padding: 8px 8px 6px 8px;
+    margin-bottom: 10px;
     font-size: 14px;
 }
 
 .compact-section {
-    margin-bottom: 8px;
+    margin-bottom: 6px;
 }
 
 .compact-section-header {
@@ -23,7 +23,7 @@
 .compact-row {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
+    gap: 6px;
     margin-bottom: 6px;
 }
 
@@ -156,8 +156,8 @@
 }
 
 .compact-form textarea {
-    min-height: 56px;
-    max-height: 160px;
+    min-height: 44px;
+    max-height: 140px;
 }
 
 .compact-form .row.g-3 {
@@ -232,6 +232,18 @@
     .certificate-inline-row .field-type {
         margin-bottom: 6px;
     }
+}
+
+/* Two-column card variant: use for wider cards to split content horizontally */
+.compact-form .card.two-column .card-body {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    align-items: start;
+}
+
+.compact-form .card.two-column .card-body>div {
+    width: 100%;
 }
 
 /* Make container entries tighter */

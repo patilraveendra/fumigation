@@ -242,9 +242,25 @@ const AlpPrint: React.FC<AlpPrintProps> = ({ data }) => {
                                                                 Container Number (or numerical link) / Seal Number
                                                             </td>
                                                             <td height="35" valign="middle" style={goodsValueCell()}>
-                                                                {containerRows.map((row, index) => (
-                                                                    <div key={`${row}-${index}`}>{row}</div>
-                                                                ))}
+                                                                {(() => {
+                                                                    const containers = data.containers ?? [];
+                                                                    const count = containers.length;
+                                                                    const ct20 = (data.ct20 || '').toString().trim();
+                                                                    const ct40 = (data.ct40 || '').toString().trim();
+                                                                    let selectedType = '';
+                                                                    if (ct20 && !ct40) selectedType = `20' ${ct20}`;
+                                                                    else if (ct40 && !ct20) selectedType = `40' ${ct40}`;
+                                                                    else if (ct20) selectedType = `20' ${ct20}`;
+                                                                    // Do not append suffix to each container number; suffix appears in the summary header only
+                                                                    return (
+                                                                        <div>
+                                                                            {selectedType ? <div style={{ marginBottom: 6 }}><strong>{`${count} X ${selectedType}`}</strong></div> : null}
+                                                                            {containers.map((c: any, idx: number) => (
+                                                                                <div key={`c-${idx}`}>{c.cont ? `${c.cont}` : ''}{c.seal ? ` / ${c.seal}` : ''}</div>
+                                                                            ))}
+                                                                        </div>
+                                                                    );
+                                                                })()}
                                                             </td>
                                                         </tr>
                                                     ) : null}

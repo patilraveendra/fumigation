@@ -29,15 +29,19 @@ function quantityText(data: CertificateData) {
 }
 
 function containerText(data: CertificateData) {
-    return (data.containers ?? [])
-        .map((container) => {
-            const contValue = cleanValue(container.cont);
-            const sealValue = cleanValue(container.seal);
-            if (!contValue && !sealValue) return '';
-            return `${contValue}${sealValue ? ` / ${sealValue}` : ''}`;
-        })
-        .filter(Boolean)
-        .join('; ');
+    const containers = (data.containers ?? []).map(c => ({ cont: cleanValue(c.cont), seal: cleanValue(c.seal) })).filter(c => c.cont || c.seal);
+    if (containers.length === 0) return '';
+    const ct20 = (data.ct20 || '').toString().trim();
+    const ct40 = (data.ct40 || '').toString().trim();
+    let selectedType = '';
+    if (ct20 && !ct40) selectedType = `20' ${ct20}`;
+    else if (ct40 && !ct20) selectedType = `40' ${ct40}`;
+    else if (ct20) selectedType = `20' ${ct20}`;
+    const suffix = selectedType.startsWith("20'") ? '-20FT' : (selectedType.startsWith("40'") ? '-40FT' : '');
+
+    const nums = containers.map(c => c.cont ? `${c.cont}` : (c.seal || '')).filter(Boolean);
+    const header = selectedType ? `${containers.length} X ${selectedType}` : '';
+    return [header, nums.join('; ')].filter(Boolean).join('\n');
 }
 
 function topToY(page: PDFPage, top: number, size: number) {

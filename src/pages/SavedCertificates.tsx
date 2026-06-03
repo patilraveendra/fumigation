@@ -75,6 +75,17 @@ function SavedCertificates({ onBack, onLogout, initialType }: SavedCertificatesP
         }
     };
 
+    const handleEdit = (record: CertificateRecord) => {
+        try {
+            const type = (record.data.certificateType ?? 'MB') as 'MB' | 'ALP';
+            const path = type === 'ALP' ? '/create/alp/form' : '/create/mbr/form';
+            navigate(path, { state: { initialValues: record.data } });
+        } catch (e) {
+            console.error('Failed to open edit form', e);
+            setStatus('Failed to open edit form');
+        }
+    };
+
     return (
         <div className="container-fluid">
             <div className="row align-items-center mb-4">
@@ -140,7 +151,10 @@ function SavedCertificates({ onBack, onLogout, initialType }: SavedCertificatesP
                                                     <td>{getPartyName(record.data)}</td>
                                                     <td>{record.data.certificateType ?? '—'}</td>
                                                     <td>
-                                                        <button type="button" className="btn btn-sm btn-outline-primary" onClick={(e) => { e.stopPropagation(); setSelectedRecordId(record.id); openInPrintTab(record); }}>View</button>
+                                                        <div className="d-flex gap-2">
+                                                            <button type="button" className="btn btn-sm btn-outline-primary" onClick={(e) => { e.stopPropagation(); setSelectedRecordId(record.id); openInPrintTab(record); }}>View</button>
+                                                            <button type="button" className="btn btn-sm btn-outline-secondary" onClick={(e) => { e.stopPropagation(); handleEdit(record); }}>Edit</button>
+                                                        </div>
                                                     </td>
                                                 </tr>
                                             ))

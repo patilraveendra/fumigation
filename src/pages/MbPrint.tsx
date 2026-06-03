@@ -51,19 +51,41 @@ const MbPrint: React.FC<MbPrintProps> = ({ data }) => {
     const fcoi = value(data.fcoi);
 
     let additionalDeclarationText = declaration || '';
+
+    const containerRows = (data.containers ?? [])
+        .map((container) => {
+            const contValue = value(container.cont);
+            const sealValue = value(container.seal);
+            if (!contValue && !sealValue) return undefined;
+            return `${contValue}${sealValue ? ` / ${sealValue}` : ''}`;
+        })
+        .filter(Boolean) as string[];
+
+    const showContainerRow = containerRows.length > 0 && data.cnoat?.toLowerCase().includes('format');
+
+    const declarationLines = [
+        declaration,
+        isAdditionalFlag(data.cnoat) && containerRows.length > 0
+            ? `Container Number (or numerical link) / Seal Number: ${containerRows.join(', ')}`
+            : undefined,
+    ].filter(Boolean) as string[];
+
+    let standardDeclarationText = '';
+    standardDeclarationText = 'I declare that these details are true & correct and the fumigation has been carried out in accordance with the NSPM 12 standards.';
+
     if (fcoi) {
         const fc = fcoi.toLowerCase();
         if (fc.includes('nspm 12 and ispm 15')) {
-            additionalDeclarationText = 'I declare that these details are true & correct and the fumigation has been carried out in accordance with NSPM 12 and ISPM 15 regulations of IPPC.';
+            standardDeclarationText = 'I declare that these details are true & correct and the fumigation has been carried out in accordance with NSPM 12 and ISPM 15 regulations of IPPC.';
         } else if (fc.includes('nspm 12')) {
-            additionalDeclarationText = 'I declare that these details are true & correct and the fumigation has been carried out in accordance with the NSPM 12 standards.';
+            standardDeclarationText = 'I declare that these details are true & correct and the fumigation has been carried out in accordance with the NSPM 12 standards.';
         }
     }
     const hasContainers = (data.containers ?? []).length > 0;
     const cnoat = (data.cnoat ?? '').toString().toLowerCase();
     // Strict behavior: when dropdown indicates 'format' show in container row;
     // when dropdown indicates 'additional' show in Additional Declaration.
-    const showContainerRow = cnoat.includes('format') && hasContainers;
+    // const showContainerRow = cnoat.includes('format') && hasContainers;
     const showContainersInDeclaration = isAdditionalFlag(cnoat) && hasContainers;
 
     const td: React.CSSProperties = {
@@ -228,11 +250,27 @@ const MbPrint: React.FC<MbPrintProps> = ({ data }) => {
                                         <tr>
                                             <td align="left" valign="top" style={cell('lbr')}>Container Number (or numerical link)/Seal Number</td>
                                             <td align="left" valign="top" style={cell('br')}>
-                                                {data.containers?.map((container, index) => (
-                                                    <div key={`${container.cont}-${index}`}>
-                                                        {container.cont}{container.seal ? ` / ${container.seal}` : ''}
-                                                    </div>
-                                                ))}
+                                                {(() => {
+                                                    const containers = data.containers ?? [];
+                                                    const count = containers.length;
+                                                    const ct20 = (data.ct20 || '').toString().trim();
+                                                    const ct40 = (data.ct40 || '').toString().trim();
+                                                    let selectedType = '';
+                                                    if (ct20 && !ct40) selectedType = `20' ${ct20}`;
+                                                    else if (ct40 && !ct20) selectedType = `40' ${ct40}`;
+                                                    else if (ct20) selectedType = `20' ${ct20}`;
+                                                    // don't append suffix to each container number — only show in the summary header
+                                                    return (
+                                                        <div>
+                                                            {selectedType ? <div style={{ marginBottom: 6 }}><strong>{`${count} X ${selectedType}`}</strong></div> : null}
+                                                            {containers.map((container: any, index: number) => (
+                                                                <div key={`${container.cont}-${index}`}>
+                                                                    {container.cont ? `${container.cont}` : ''}{container.seal ? ` / ${container.seal}` : ''}
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    );
+                                                })()}
                                             </td>
                                         </tr>
                                     ) : null}
@@ -289,13 +327,19 @@ const MbPrint: React.FC<MbPrintProps> = ({ data }) => {
                             <table width="100%" cellPadding={0} cellSpacing={0} style={{ borderCollapse: 'collapse' }}>
                                 <tbody>
                                     <tr>
-                                        <td style={cell('')}>
-                                            <strong><u>&nbsp;Additional Declaration</u></strong> : {additionalDeclarationText}
+                                        <td height="35" align="left" valign="middle" style={cell('', { padding: 5 })}>
+                                            <strong><u>&nbsp;Additional Declaration</u></strong> :
+                                            {declarationLines.map((line, index) => (
+                                                <div key={index} style={{ marginTop: index === 0 ? 0 : 4 }}>
+                                                    {line}
+                                                </div>
+                                            ))}
                                         </td>
+                                        <td width="32">&nbsp;</td>
                                     </tr>
-                                    <tr>
+                                    {/*  <tr>
                                         <td style={cell('', { fontSize: 9 })}>
-                                            &nbsp;I declare that these details are true &amp; correct and the fumigation has been carried out in accordence with the NSPM 12 standards.
+                                            {additionalDeclarationText}
                                             {showContainersInDeclaration ? (
                                                 <div style={{ marginTop: 8 }}>
                                                     <strong>Container Numbers/Seals:</strong>
@@ -309,6 +353,12 @@ const MbPrint: React.FC<MbPrintProps> = ({ data }) => {
                                                 </div>
                                             ) : null}
                                         </td>
+                                    </tr>*/}
+                                    <tr>
+                                        <td style={cell('', { padding: 5, fontSize: 9 })}>
+                                            {standardDeclarationText}  &nbsp;
+                                        </td>
+                                        <td>&nbsp;</td>
                                     </tr>
                                 </tbody>
                             </table>
