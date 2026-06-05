@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { fetchCertificates, type CertificateRecord } from '../api/apiService';
 import { pingApi } from '../api/apiService';
 import { type CertificateData } from '../types/certificate';
+import MbPrint from './MbPrint';
+import AlpPrint from './AlpPrint';
 import './CertificateForm.compact.css';
 
 interface SavedCertificatesProps {
@@ -55,8 +57,34 @@ function SavedCertificates({ onBack, onLogout, initialType }: SavedCertificatesP
     };
 
     const selectedRecord = records.find((record) => record.id === selectedRecordId);
+    const [showJson, setShowJson] = useState(false);
     const filteredRecords = records.filter((r) => (r.data.certificateType ?? 'MB') === selectedType);
     const navigate = useNavigate();
+
+    const openInPrintTab = (record: CertificateRecord) => {
+        try {
+            // debug: log record metadata and containers so we can confirm shape
+            try { console.debug('openInPrintTab: certificateNumber=', record.data.certificateNumber, 'certificateId=', (record.data as any).certificateId, 'containers=', record.data.containers); } catch { }
+            // write to both sessionStorage and localStorage so new tabs can read it
+            try { sessionStorage.setItem('printData', JSON.stringify(record.data)); } catch { }
+            try { localStorage.setItem('printData', JSON.stringify(record.data)); } catch { }
+            window.open('/print', '_blank');
+        } catch (e) {
+            console.error('Failed to open print tab', e);
+            setStatus('Failed to open print tab.');
+        }
+    };
+
+    const handleEdit = (record: CertificateRecord) => {
+        try {
+            const type = (record.data.certificateType ?? 'MB') as 'MB' | 'ALP';
+            const path = type === 'ALP' ? '/create/alp/form' : '/create/mbr/form';
+            navigate(path, { state: { initialValues: record.data } });
+        } catch (e) {
+            console.error('Failed to open edit form', e);
+            setStatus('Failed to open edit form');
+        }
+    };
 
     return (
         <div className="container-fluid">
@@ -117,13 +145,16 @@ function SavedCertificates({ onBack, onLogout, initialType }: SavedCertificatesP
                                             </tr>
                                         ) : (
                                             filteredRecords.map((record) => (
-                                                <tr key={record.id}>
+                                                <tr key={record.id} style={{ cursor: 'pointer' }} onClick={() => setSelectedRecordId(record.id)}>
                                                     <td>{record.data.certificateNumber ?? '—'}</td>
                                                     <td>{record.data.dateIssued ? new Date(record.data.dateIssued).toLocaleDateString() : '—'}</td>
                                                     <td>{getPartyName(record.data)}</td>
                                                     <td>{record.data.certificateType ?? '—'}</td>
                                                     <td>
-                                                        <button type="button" className="btn btn-sm btn-outline-primary" onClick={() => setSelectedRecordId(record.id)}>View</button>
+                                                        <div className="d-flex gap-2">
+                                                            <button type="button" className="btn btn-sm btn-outline-primary" onClick={(e) => { e.stopPropagation(); setSelectedRecordId(record.id); openInPrintTab(record); }}>View</button>
+                                                            <button type="button" className="btn btn-sm btn-outline-secondary" onClick={(e) => { e.stopPropagation(); handleEdit(record); }}>Edit</button>
+                                                        </div>
                                                     </td>
                                                 </tr>
                                             ))
@@ -135,33 +166,7 @@ function SavedCertificates({ onBack, onLogout, initialType }: SavedCertificatesP
                     </div>
                 </div>
 
-                <div className="col-lg-4">
-                    {selectedRecord ? (
-                        <div className="card">
-                            <div className="card-header">Certificate details</div>
-                            <div className="card-body">
-                                <div className="mb-2"><strong>Certificate Number:</strong> {selectedRecord.data.certificateNumber ?? '—'}</div>
-                                <div className="mb-2"><strong>Date Issued:</strong> {selectedRecord.data.dateIssued ?? '—'}</div>
-                                <div className="mb-2"><strong>Date of Fumigation:</strong> {selectedRecord.data.fumigationStarted ?? '—'}</div>
-                                <div className="mb-2"><strong>Fumigator Name:</strong> {selectedRecord.data.fumigatorName ?? '—'}</div>
-                                <div className="mb-2"><strong>Certificate Type:</strong> {selectedRecord.data.certificateType ?? '—'}</div>
-                                <div className="mb-2"><strong>Party Name:</strong> {getPartyName(selectedRecord.data)}</div>
-                                <div className="mb-2"><strong>Exporter:</strong> {selectedRecord.data.exporterName ?? '—'}</div>
-                                <div className="mb-2"><strong>Consignee:</strong> {selectedRecord.data.consigneeName ?? '—'}</div>
-                                <div className="mb-2"><strong>Fumigant:</strong> {selectedRecord.data.fumigantName ?? '—'}</div>
-                                <div className="mb-2"><strong>Place:</strong> {selectedRecord.data.placeOfFumigation ?? '—'}</div>
-                                <div className="mb-2"><strong>Dose Rate:</strong> {selectedRecord.data.doseRate ?? '—'}</div>
-                                <div className="mb-2"><strong>Duration:</strong> {selectedRecord.data.durationFumigation ?? '—'}</div>
-                                <div className="mb-2"><strong>Temperature:</strong> {selectedRecord.data.temperature ?? '—'}</div>
-                                <div className="mb-2"><strong>Humidity:</strong> {selectedRecord.data.humidity ?? '—'}</div>
-                            </div>
-                        </div>
-                    ) : (
-                        <div className="card">
-                            <div className="card-body text-muted">Select a certificate to view details here.</div>
-                        </div>
-                    )}
-                </div>
+
             </div>
         </div>
     );

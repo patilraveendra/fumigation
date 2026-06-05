@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import './Login.compact.css';
 
 interface LoginProps {
     onLogin: () => void;
@@ -30,34 +31,36 @@ function Login({ onLogin }: LoginProps) {
     };
 
     return (
-        <div className="container" style={{ minHeight: '80vh', display: 'flex', alignItems: 'center' }}>
-            <div className="row justify-content-center w-100">
-                <div className="col-12 col-md-6 col-lg-4">
-                    <div className="card shadow-sm">
-                        <div className="card-header bg-dark text-white text-center">
-                            <div className="small text-muted">ADMIN LOGIN</div>
-                            <h4 className="mb-0">Fumigation Certificate Portal</h4>
-                            <div className="text-muted small">Enter your admin credentials to continue.</div>
-                        </div>
-                        <div className="card-body">
-                            <form onSubmit={handleSubmit}>
-                                <div className="mb-3">
-                                    <label className="form-label">Username</label>
-                                    <input type="text" className="form-control" value={username} onChange={(e) => setUsername(e.target.value)} autoComplete="username" />
-                                </div>
-                                <div className="mb-3">
-                                    <label className="form-label">Password</label>
-                                    <input type="password" className="form-control" value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="current-password" />
-                                </div>
+        <div className="page-shell">
+            <div className="login-card">
+                <div className="login-header">
+                    <div className="eyebrow">ADMIN LOGIN</div>
+                    <div className="login-title">Fumigation Certificate Portal</div>
+                    <div className="login-desc">Enter your admin credentials to continue.</div>
+                </div>
 
-                                {error ? <div className="alert alert-danger">{error}</div> : null}
-
-                                <div className="d-flex justify-content-end">
-                                    <button type="submit" className="btn btn-danger">Login</button>
-                                </div>
-                            </form>
+                <div className="certificate-form">
+                    <form onSubmit={handleSubmit} className="form-section">
+                        <div className="field-item">
+                            <span>Username</span>
+                            <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} autoComplete="username" />
                         </div>
-                    </div>
+
+                        <div className="field-item">
+                            <span>Password</span>
+                            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="current-password" />
+                        </div>
+
+                        {error ? (
+                            <div className="form-status">
+                                <p>{error}</p>
+                            </div>
+                        ) : null}
+
+                        <div className="form-actions">
+                            <button type="submit" className="primary-button">Login</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>

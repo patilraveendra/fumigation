@@ -19,8 +19,29 @@ function cleanValue(value: string | undefined) {
     return value?.trim() || '';
 }
 
+function isAdditionalFlag(val?: string) {
+    const s = val?.toLowerCase() ?? '';
+    return s.includes('additional') || s.includes('addtional') || s.includes('addit');
+}
+
 function quantityText(data: CertificateData) {
     return [data.commodityQuantity, data.netWeight].map(cleanValue).filter(Boolean).join(' / ');
+}
+
+function containerText(data: CertificateData) {
+    const containers = (data.containers ?? []).map(c => ({ cont: cleanValue(c.cont), seal: cleanValue(c.seal) })).filter(c => c.cont || c.seal);
+    if (containers.length === 0) return '';
+    const ct20 = (data.ct20 || '').toString().trim();
+    const ct40 = (data.ct40 || '').toString().trim();
+    let selectedType = '';
+    if (ct20 && !ct40) selectedType = `20' ${ct20}`;
+    else if (ct40 && !ct20) selectedType = `40' ${ct40}`;
+    else if (ct20) selectedType = `20' ${ct20}`;
+    const suffix = selectedType.startsWith("20'") ? '-20FT' : (selectedType.startsWith("40'") ? '-40FT' : '');
+
+    const nums = containers.map(c => c.cont ? `${c.cont}` : (c.seal || '')).filter(Boolean);
+    const header = selectedType ? `${containers.length} X ${selectedType}` : '';
+    return [header, nums.join('; ')].filter(Boolean).join('\n');
 }
 
 function topToY(page: PDFPage, top: number, size: number) {
@@ -137,6 +158,17 @@ export async function renderAlpPdf(pdfDoc: PDFDocument, data: CertificateData) {
     const page = await createTemplatePage(pdfDoc, 'ALP');
     const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
 
+    const containerTextValue = data.cnoat?.toLowerCase().includes('format') ? containerText(data) : '';
+    const declarationSource = cleanValue(data.declarationText || data.declaration);
+    const declarationTextValue = isAdditionalFlag(data.cnoat) && containerText(data)
+        ? [declarationSource, containerText(data)].filter(Boolean).join(' ')
+        : declarationSource;
+    const humiditySource = cleanValue(data.humidity);
+    const tempSource = cleanValue(data.temperature || data.f_temperature);
+    const humidityTextValue = humiditySource
+        ? `${humiditySource}%${tempSource ? ` (TEMP ${tempSource}°C)` : ''}`
+        : (tempSource ? `TEMP ${tempSource}°C` : '');
+
     drawFields(page, font, [
         { text: data.certificateNumber, x: 420, top: 115, width: 118, height: 18 },
         { text: data.dateIssued, x: 420, top: 137, width: 118, height: 14 },
@@ -145,14 +177,16 @@ export async function renderAlpPdf(pdfDoc: PDFDocument, data: CertificateData) {
         { text: data.placeOfFumigation, x: 256, top: 247, width: 282, height: 13, offsetY: -4 },
         { text: data.doseRate, x: 256, top: 261, width: 282, height: 13, offsetY: -4 },
         { text: data.durationFumigation, x: 256, top: 275, width: 282, height: 13, offsetY: -4 },
-        { text: data.humidity || data.temperature, x: 256, top: 289, width: 282, height: 22, offsetY: -4 },
+        { text: humidityTextValue, x: 256, top: 289, width: 282, height: 22, offsetY: -4 },
         { text: data.exporterName, x: 256, top: 342, width: 282, height: 44 },
         { text: data.consigneeName, x: 256, top: 387, width: 282, height: 31 },
-        { text: data.commodityDescription, x: 256, top: 419, width: 282, height: 19, offsetY: -5 },
-        { text: quantityText(data), x: 256, top: 439, width: 282, height: 35, offsetY: -6 },
-        { text: data.packagingMaterial, x: 256, top: 475, width: 282, height: 18, offsetY: -4 },
-        { text: data.shippingMark, x: 256, top: 494, width: 282, height: 15, offsetY: -4 },
-        { text: data.declarationText, x: 256, top: 510, width: 282, height: 35, offsetY: -4 },
+        { text: data.notify, x: 256, top: 420, width: 282, height: 12, size: 8, minSize: 6 },
+        { text: containerTextValue, x: 256, top: 419, width: 282, height: 18, size: 9, minSize: 6, offsetY: -4 },
+        { text: data.commodityDescription, x: 256, top: 439, width: 282, height: 19, offsetY: -5 },
+        { text: quantityText(data), x: 256, top: 460, width: 282, height: 35, offsetY: -6 },
+        { text: data.packagingMaterial, x: 256, top: 496, width: 282, height: 18, offsetY: -4 },
+        { text: data.shippingMark, x: 256, top: 515, width: 282, height: 15, offsetY: -4 },
+        { text: declarationTextValue, x: 256, top: 531, width: 282, height: 35, offsetY: -4 },
         { text: data.fumigatorName || data.accreditationNumber, x: 96, top: 574, width: 286, height: 8, size: 4.4, minSize: 4 },
         { text: data.dateIssued || data.fumigationCompleted, x: 393, top: 574, width: 82, height: 8, size: 4.4, minSize: 4 },
     ]);

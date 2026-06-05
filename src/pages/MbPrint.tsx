@@ -20,11 +20,27 @@ function formatDate(date?: string) {
     return date;
 }
 
+function isAdditionalFlag(val?: string) {
+    const s = val?.toLowerCase() ?? '';
+    return s.includes('additional') || s.includes('addtional') || s.includes('addit');
+}
+
 const MbPrint: React.FC<MbPrintProps> = ({ data }) => {
     const destinationCountry = value(data.destinationCountry, data.tc_country);
-    const dosage = value(`${value(data.f_doserate, data.doseRate)} ${value(data.f_dosetype)}`.trim());
-    const duration = value(`${value(data.f_duration, data.durationFumigation)} ${value(data.f_hour)}`.trim());
-    const temperature = value(`${value(data.f_temperature, data.temperature)} ${value(data.f_ttype)}`.trim());
+    // Dosage: prefer explicit dose and type; fall back to default unit when missing
+    const doseVal = value(data.f_doserate, data.doseRate);
+    const doseUnit = value(data.f_dosetype);
+    const dosage = doseVal ? `${doseVal}${doseUnit ? ` ${doseUnit}` : ' GRMS /CU.M'}` : '';
+
+    // Duration: prefer explicit duration and hour unit; fall back to HOURS
+    const durVal = value(data.f_duration, data.durationFumigation);
+    const durUnit = value(data.f_hour);
+    const duration = durVal ? `${durVal}${durUnit ? ` ${durUnit}` : ' HOURS'}` : '';
+
+    // Temperature: prefer explicit temperature and unit; fall back to DEG. CELSIUS
+    const tempVal = value(data.f_temperature, data.temperature);
+    const tempUnit = value(data.f_ttype);
+    const temperature = tempVal ? `${tempVal}${tempUnit ? ` ${tempUnit}` : ' DEG. CELSIUS'}` : '';
     const exporterName = value(data.d_name, data.exporterName);
     const consigneeName = value(data.c_name, data.consigneeName);
     const quantity = value(data.quantityDeclared, data.commodityQuantity, data.noOfQuantity);
@@ -32,7 +48,45 @@ const MbPrint: React.FC<MbPrintProps> = ({ data }) => {
     const shippingMark = value(data.shippingMark, data.l_ship, '.');
     const invoice = value(data.invoiceno, [data.invoiceNumber, formatDate(data.invoiceDate)].filter(Boolean).join(' dated '));
     const declaration = value(data.declaration, data.declarationText);
-    const showContainerRow = data.cnoat?.toLowerCase().includes('format') && data.containers && data.containers.length > 0;
+    const fcoi = value(data.fcoi);
+
+    let additionalDeclarationText = declaration || '';
+
+    const containerRows = (data.containers ?? [])
+        .map((container) => {
+            const contValue = value(container.cont);
+            const sealValue = value(container.seal);
+            if (!contValue && !sealValue) return undefined;
+            return `${contValue}${sealValue ? ` / ${sealValue}` : ''}`;
+        })
+        .filter(Boolean) as string[];
+
+    const showContainerRow = containerRows.length > 0 && data.cnoat?.toLowerCase().includes('format');
+
+    const declarationLines = [
+        declaration,
+        isAdditionalFlag(data.cnoat) && containerRows.length > 0
+            ? `Container Number (or numerical link) / Seal Number: ${containerRows.join(', ')}`
+            : undefined,
+    ].filter(Boolean) as string[];
+
+    let standardDeclarationText = '';
+    standardDeclarationText = 'I declare that these details are true & correct and the fumigation has been carried out in accordance with the NSPM 12 standards.';
+
+    if (fcoi) {
+        const fc = fcoi.toLowerCase();
+        if (fc.includes('nspm 12 and ispm 15')) {
+            standardDeclarationText = 'I declare that these details are true & correct and the fumigation has been carried out in accordance with NSPM 12 and ISPM 15 regulations of IPPC.';
+        } else if (fc.includes('nspm 12')) {
+            standardDeclarationText = 'I declare that these details are true & correct and the fumigation has been carried out in accordance with the NSPM 12 standards.';
+        }
+    }
+    const hasContainers = (data.containers ?? []).length > 0;
+    const cnoat = (data.cnoat ?? '').toString().toLowerCase();
+    // Strict behavior: when dropdown indicates 'format' show in container row;
+    // when dropdown indicates 'additional' show in Additional Declaration.
+    // const showContainerRow = cnoat.includes('format') && hasContainers;
+    const showContainersInDeclaration = isAdditionalFlag(cnoat) && hasContainers;
 
     const td: React.CSSProperties = {
         fontFamily: 'Arial, Helvetica, sans-serif',
@@ -90,48 +144,48 @@ const MbPrint: React.FC<MbPrintProps> = ({ data }) => {
             >
                 <tbody>
                     <tr>
+                        <td colSpan={4}>
+                            <br /><br /><br /><br /><br /><br /><br />
+                        </td>
+                    </tr>
+                    <tr>
                         <td width="38" rowSpan={7}>
                             <br /><br /><br /><br /><br /><br /><br />
                         </td>
                         <td align="left">
                             <table width="100%" cellPadding={0} cellSpacing={0} style={{ border: '1px solid #666', borderCollapse: 'collapse' }}>
                                 <tbody>
-                                    <tr>
-                                        <td colSpan={2}>
-                                            <br /><br /><br /><br /><br /><br />
-                                        </td>
-                                    </tr>
+
                                     <tr>
                                         <td
-                                            width="48%"
+                                            width="50%"
                                             rowSpan={2}
                                             valign="top"
                                             align="left"
                                             style={cell('ltrb', { textAlign: 'justify' })}
                                         >
-                                            PEST RELIEF (INDIA) PVT. LTD.<br />
-                                            711, 712 Commodity Exchange Building, sector 19,<br />
-                                            vashi, NAVI MUMBAI-400 703. Maharashtra INDIA.
+                                            PEST AND SOLUTIONS<br />
+                                            721, Commodity Exchange Building, Sector 19,
+                                            Vashi, Navi Mumbai-400 703. Maharashtra, India.
+
                                             <br />
                                             <strong>
-                                                Dte. PPQS Regn. No. :MB/343
-                                                <span style={{ float: 'right' }}>DT: 27-07-2010</span>
+                                                Dte PPQS Regd. No : IN-MB-MUM1131 Dt: 29-01-2026
+
                                             </strong>
                                         </td>
-                                        <td width="52%" height="20" style={cell('tr')}>
+                                        <td width="50%" height="20" style={cell('tr')}>
                                             <strong>Treatment Certificate Number :&nbsp; {value(data.certificateNumber)}</strong>
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td width="52%" height="20" style={cell('trb')}>
+                                        <td width="50%" height="20" style={cell('trb')}>
                                             <strong>Date of Issue :&nbsp;{formatDate(value(data.dateIssued))}</strong>
                                         </td>
                                     </tr>
                                     <tr>
                                         <td height="33" colSpan={2} style={paragraph}>
                                             &nbsp;&nbsp;&nbsp;&nbsp;This is to certify that the goods described below were treated in accordance with the fumigation treatment requirements of importing country <strong>&nbsp;{destinationCountry}</strong>, and declared that the consignment has been verified free of impervious surface/layers such as plastic wrapping or laminated plastic films, lacquered or painted surfaces, Aluminum foil, tarred or waxed paper etc. that may adversely affect the penetration of the fumigant, prior to fumigation.
-                                            <br />
-                                            &nbsp;&nbsp;&nbsp;&nbsp;The Certificate is valid for the consignments shipped within 21 days from the date of completion of fumigation.
                                         </td>
                                     </tr>
                                 </tbody>
@@ -196,11 +250,27 @@ const MbPrint: React.FC<MbPrintProps> = ({ data }) => {
                                         <tr>
                                             <td align="left" valign="top" style={cell('lbr')}>Container Number (or numerical link)/Seal Number</td>
                                             <td align="left" valign="top" style={cell('br')}>
-                                                {data.containers?.map((container, index) => (
-                                                    <div key={`${container.cont}-${index}`}>
-                                                        {container.cont}{container.seal ? ` / ${container.seal}` : ''}
-                                                    </div>
-                                                ))}
+                                                {(() => {
+                                                    const containers = data.containers ?? [];
+                                                    const count = containers.length;
+                                                    const ct20 = (data.ct20 || '').toString().trim();
+                                                    const ct40 = (data.ct40 || '').toString().trim();
+                                                    let selectedType = '';
+                                                    if (ct20 && !ct40) selectedType = `20' ${ct20}`;
+                                                    else if (ct40 && !ct20) selectedType = `40' ${ct40}`;
+                                                    else if (ct20) selectedType = `20' ${ct20}`;
+                                                    // don't append suffix to each container number — only show in the summary header
+                                                    return (
+                                                        <div>
+                                                            {selectedType ? <div style={{ marginBottom: 6 }}><strong>{`${count} X ${selectedType}`}</strong></div> : null}
+                                                            {containers.map((container: any, index: number) => (
+                                                                <div key={`${container.cont}-${index}`}>
+                                                                    {container.cont ? `${container.cont}` : ''}{container.seal ? ` / ${container.seal}` : ''}
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    );
+                                                })()}
                                             </td>
                                         </tr>
                                     ) : null}
@@ -236,6 +306,12 @@ const MbPrint: React.FC<MbPrintProps> = ({ data }) => {
                                             {consigneeName}<br />{value(data.c_address)}
                                         </td>
                                     </tr>
+                                    {data.notify ? (
+                                        <tr>
+                                            <td style={cell('lbr')}>Notify Party</td>
+                                            <td style={cell('br')}>{value(data.notify)}</td>
+                                        </tr>
+                                    ) : null}
                                     {invoice ? (
                                         <tr>
                                             <td style={cell('lbr')}>&nbsp;INVOICE NO. AND DATE</td>
@@ -251,14 +327,38 @@ const MbPrint: React.FC<MbPrintProps> = ({ data }) => {
                             <table width="100%" cellPadding={0} cellSpacing={0} style={{ borderCollapse: 'collapse' }}>
                                 <tbody>
                                     <tr>
-                                        <td style={cell('')}>
-                                            <strong><u>&nbsp;Additional Declaration</u></strong> : {declaration}
+                                        <td height="35" align="left" valign="middle" style={cell('', { padding: 5 })}>
+                                            <strong><u>&nbsp;Additional Declaration</u></strong> :
+                                            {declarationLines.map((line, index) => (
+                                                <div key={index} style={{ marginTop: index === 0 ? 0 : 4 }}>
+                                                    {line}
+                                                </div>
+                                            ))}
                                         </td>
+                                        <td width="32">&nbsp;</td>
                                     </tr>
-                                    <tr>
+                                    {/*  <tr>
                                         <td style={cell('', { fontSize: 9 })}>
-                                            &nbsp;I declare that these details are true &amp; correct and the fumigation has been carried out in accordence with the NSPM 12 standards.
+                                            {additionalDeclarationText}
+                                            {showContainersInDeclaration ? (
+                                                <div style={{ marginTop: 8 }}>
+                                                    <strong>Container Numbers/Seals:</strong>
+                                                    <div>
+                                                        {data.containers?.map((c, idx) => (
+                                                            <div key={`decl-cont-${idx}`}>
+                                                                {c.cont}{c.seal ? ` / ${c.seal}` : ''}
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            ) : null}
                                         </td>
+                                    </tr>*/}
+                                    <tr>
+                                        <td style={cell('', { padding: 5, fontSize: 9 })}>
+                                            {standardDeclarationText}  &nbsp;
+                                        </td>
+                                        <td>&nbsp;</td>
                                     </tr>
                                 </tbody>
                             </table>

@@ -1,3 +1,38 @@
+.home-brand {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+}
+
+.brand-logo {
+    width: 52px;
+    height: 52px;
+    object-fit: contain;
+}
+
+.brand-copy {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.brand-copy strong {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #163B73;
+    line-height: 1;
+}
+
+.brand-copy span {
+    font-size: 0.85rem;
+    color: #2E8E57;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
 .page-shell {
     min-height: 100vh;
     padding: 32px;

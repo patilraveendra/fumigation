@@ -4,7 +4,7 @@ import { DPPQS_REGISTRATIONS } from '../constants/mbrConstants';
 
 const NewMbrStart: React.FC = () => {
     const navigate = useNavigate();
-    const [registration, setRegistration] = useState(DPPQS_REGISTRATIONS[0].value);
+    const [registration, setRegistration] = useState('');
     const [date, setDate] = useState('');
     const [certNumber, setCertNumber] = useState('');
 
@@ -27,6 +27,7 @@ const NewMbrStart: React.FC = () => {
                         <label className="col-sm-3 col-form-label">DPPQS Registration No</label>
                         <div className="col-sm-6">
                             <select className="form-select" value={registration} onChange={(e) => setRegistration(e.target.value)}>
+                                <option value="">Select DPPQS Registration</option>
                                 {DPPQS_REGISTRATIONS.map((r) => (
                                     <option key={r.value} value={r.value}>{r.label}</option>
                                 ))}
@@ -44,7 +45,7 @@ const NewMbrStart: React.FC = () => {
                     <div className="mb-3 row align-items-center">
                         <label className="col-sm-3 col-form-label">Certificate No.</label>
                         <div className="col-sm-6">
-                            <input className="form-control" value={certNumber} onChange={(e) => setCertNumber(e.target.value)} placeholder="PRI/MB/0001/2026-27" />
+                            <input className="form-control" value={certNumber} onChange={(e) => setCertNumber(e.target.value)} />
                         </div>
                     </div>
 

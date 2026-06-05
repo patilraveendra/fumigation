@@ -23,6 +23,22 @@ function quantityText(data: CertificateData) {
     return [data.commodityQuantity, data.netWeight].map(cleanValue).filter(Boolean).join(' / ');
 }
 
+function containerText(data: CertificateData) {
+    const containers = (data.containers ?? []).map(c => ({ cont: cleanValue(c.cont), seal: cleanValue(c.seal) })).filter(c => c.cont || c.seal);
+    if (containers.length === 0) return '';
+    const ct20 = (data.ct20 || '').toString().trim();
+    const ct40 = (data.ct40 || '').toString().trim();
+    let selectedType = '';
+    if (ct20 && !ct40) selectedType = `20' ${ct20}`;
+    else if (ct40 && !ct20) selectedType = `40' ${ct40}`;
+    else if (ct20) selectedType = `20' ${ct20}`;
+    const suffix = selectedType.startsWith("20'") ? '-20FT' : (selectedType.startsWith("40'") ? '-40FT' : '');
+
+    const nums = containers.map(c => c.cont ? `${c.cont}` : (c.seal || '')).filter(Boolean);
+    const header = selectedType ? `${containers.length} X ${selectedType}` : '';
+    return [header, nums.join('; ')].filter(Boolean).join('\n');
+}
+
 function topToY(page: PDFPage, top: number, size: number) {
     return page.getHeight() - top - size;
 }
@@ -137,6 +153,8 @@ export async function renderMbPdf(pdfDoc: PDFDocument, data: CertificateData) {
     const page = await createTemplatePage(pdfDoc, 'MB');
     const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
 
+    const containerTextValue = data.cnoat?.toLowerCase().includes('format') ? containerText(data) : '';
+
     drawFields(page, font, [
         { text: data.certificateNumber, x: 416, top: 124, width: 125, height: 16 },
         { text: data.dateIssued, x: 416, top: 148, width: 125, height: 16 },
@@ -148,7 +166,9 @@ export async function renderMbPdf(pdfDoc: PDFDocument, data: CertificateData) {
         { text: data.temperature, x: 443, top: 262, width: 98, height: 13, offsetY: -4 },
         { text: data.exporterName, x: 269, top: 322, width: 270, height: 42 },
         { text: data.consigneeName, x: 269, top: 365, width: 270, height: 42 },
+        { text: data.notify, x: 269, top: 408, width: 270, height: 12, size: 8, minSize: 6 },
         { text: data.commodityDescription, x: 269, top: 407, width: 270, height: 29, offsetY: -8 },
+        { text: containerTextValue, x: 269, top: 395, width: 270, height: 18, size: 9, minSize: 6, offsetY: -4 },
         { text: quantityText(data), x: 269, top: 437, width: 270, height: 18, offsetY: -4 },
         { text: data.packagingMaterial, x: 269, top: 456, width: 270, height: 20, offsetY: -4 },
         { text: data.shippingMark, x: 269, top: 477, width: 270, height: 15, offsetY: -4 },

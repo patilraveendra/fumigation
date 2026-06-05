@@ -20,6 +20,11 @@ function formatDate(date?: string) {
     return date;
 }
 
+function isAdditionalFlag(val?: string) {
+    const s = val?.toLowerCase() ?? '';
+    return s.includes('additional') || s.includes('addtional') || s.includes('addit');
+}
+
 const AlpPrint: React.FC<AlpPrintProps> = ({ data }) => {
     const destinationCountry = value(data.destinationCountry, data.tc_country);
     const dosage = value(`${value(data.f_doserate, data.doseRate)} ${value(data.f_dosetype)}`.trim());
@@ -31,6 +36,26 @@ const AlpPrint: React.FC<AlpPrintProps> = ({ data }) => {
     const shippingMark = value(data.shippingMark, data.l_ship);
     const invoice = value(data.invoiceno, [data.invoiceNumber, formatDate(data.invoiceDate)].filter(Boolean).join(' dated '));
     const declaration = value(data.declaration, data.declarationText);
+    const containerRows = (data.containers ?? [])
+        .map((container) => {
+            const contValue = value(container.cont);
+            const sealValue = value(container.seal);
+            if (!contValue && !sealValue) return undefined;
+            return `${contValue}${sealValue ? ` / ${sealValue}` : ''}`;
+        })
+        .filter(Boolean) as string[];
+    const showContainerRow = containerRows.length > 0 && data.cnoat?.toLowerCase().includes('format');
+    const declarationLines = [
+        declaration,
+        isAdditionalFlag(data.cnoat) && containerRows.length > 0
+            ? `Container Number (or numerical link) / Seal Number: ${containerRows.join(', ')}`
+            : undefined,
+    ].filter(Boolean) as string[];
+    const humidityVal = value(data.humidity);
+    const tempVal = value(data.temperature, data.f_temperature);
+    const humidityDisplay = humidityVal
+        ? `${humidityVal}%${tempVal ? ` (TEMP ${tempVal}°C)` : ''}`
+        : (tempVal ? `TEMP ${tempVal}°C` : '');
 
     const td: React.CSSProperties = {
         fontFamily: 'Arial, Helvetica, sans-serif',
@@ -119,14 +144,15 @@ const AlpPrint: React.FC<AlpPrintProps> = ({ data }) => {
                                                             valign="top"
                                                             style={cell('ltrb', { textAlign: 'justify' })}
                                                         >
-                                                            PEST RELIEF (INDIA) PVT. LTD.<br />
-                                                            711/712, 7th floor, commodity exchange building, sector-19, vashi, navi mumbai-400703 (ms)<br />
+                                                            PEST AND SOLUTIONS<br />
+                                                            721, Commodity Exchange Building, Sector 19,
+                                                            Vashi, NAVI MUMBAI-400 703. Maharashtra INDIA.
+
                                                             <strong>
-                                                                Dte PPQS Regd. No :IN-ALP-MUM0015
-                                                                <span style={{ float: 'right' }}>dt: 03-06-2012</span>
+                                                                Dte PPQS Regd. No :IN-ALP-MUM0180  Dt:29-01-2026
                                                             </strong>
                                                         </td>
-                                                        <td width="56%" height="35" colSpan={2} style={cell('tr')}>
+                                                        <td width="50%" height="35" colSpan={2} style={cell('tr')}>
                                                             Treatment Certificate Number :&nbsp; {value(data.certificateNumber)}
                                                         </td>
                                                     </tr>
@@ -143,8 +169,6 @@ const AlpPrint: React.FC<AlpPrintProps> = ({ data }) => {
                                         <td height="35" colSpan={4} style={para}>
                                             <em>
                                                 &nbsp;&nbsp;&nbsp;&nbsp;This is to certify that the goods described below were treated in accordance with the fumigation treatment requirements of importing country <strong>{destinationCountry}</strong> and declared that the consignment has been verified free of impervious surfaces/layers such as plastic wrapping or laminated plastic films, lacquered or painted surfaces, aluminium foil, tarred or waxed paper etc., that may adversely effect the penetration of the fumigant, prior to fumigation.
-                                                <br />
-                                                &nbsp;&nbsp;&nbsp;&nbsp;The Certificate is valid for the consignments shipped within 21 days from the date of completion of fumigation.
                                             </em>
                                         </td>
                                     </tr>
@@ -175,7 +199,7 @@ const AlpPrint: React.FC<AlpPrintProps> = ({ data }) => {
                                                     </tr>
                                                     <tr>
                                                         <td height="35" colSpan={2} style={cell('lbr')}>Average ambient humidity during fumigation :</td>
-                                                        <td height="35" colSpan={2} style={cell('br')}>{value(data.humidity)}</td>
+                                                        <td height="35" colSpan={2} style={cell('br')}>{humidityDisplay}</td>
                                                     </tr>
                                                     <tr>
                                                         <td height="35" colSpan={2} style={cell('lbr')}>Fumigation Performed under gastight sheets :</td>
@@ -206,6 +230,40 @@ const AlpPrint: React.FC<AlpPrintProps> = ({ data }) => {
                                                             {consigneeName}<br />{value(data.c_address)}
                                                         </td>
                                                     </tr>
+                                                    {data.notify ? (
+                                                        <tr>
+                                                            <td height="35" style={goodsLabelCell()}>Notify Party :</td>
+                                                            <td height="35" style={goodsValueCell()}>{value(data.notify)}</td>
+                                                        </tr>
+                                                    ) : null}
+                                                    {showContainerRow ? (
+                                                        <tr>
+                                                            <td height="35" valign="middle" style={goodsLabelCell()}>
+                                                                Container Number (or numerical link) / Seal Number
+                                                            </td>
+                                                            <td height="35" valign="middle" style={goodsValueCell()}>
+                                                                {(() => {
+                                                                    const containers = data.containers ?? [];
+                                                                    const count = containers.length;
+                                                                    const ct20 = (data.ct20 || '').toString().trim();
+                                                                    const ct40 = (data.ct40 || '').toString().trim();
+                                                                    let selectedType = '';
+                                                                    if (ct20 && !ct40) selectedType = `20' ${ct20}`;
+                                                                    else if (ct40 && !ct20) selectedType = `40' ${ct40}`;
+                                                                    else if (ct20) selectedType = `20' ${ct20}`;
+                                                                    // Do not append suffix to each container number; suffix appears in the summary header only
+                                                                    return (
+                                                                        <div>
+                                                                            {selectedType ? <div style={{ marginBottom: 6 }}><strong>{`${count} X ${selectedType}`}</strong></div> : null}
+                                                                            {containers.map((c: any, idx: number) => (
+                                                                                <div key={`c-${idx}`}>{c.cont ? `${c.cont}` : ''}{c.seal ? ` / ${c.seal}` : ''}</div>
+                                                                            ))}
+                                                                        </div>
+                                                                    );
+                                                                })()}
+                                                            </td>
+                                                        </tr>
+                                                    ) : null}
                                                     <tr>
                                                         <td height="35" valign="middle" style={goodsLabelCell()}>Type &amp; Description Of Cargo :</td>
                                                         <td height="35" valign="middle" style={goodsValueCell()}>
@@ -239,7 +297,12 @@ const AlpPrint: React.FC<AlpPrintProps> = ({ data }) => {
                     </tr>
                     <tr>
                         <td height="35" align="left" valign="middle" style={cell('', { padding: 5 })}>
-                            <strong><u>&nbsp;Additional Declaration</u></strong> : {declaration}
+                            <strong><u>&nbsp;Additional Declaration</u></strong> :
+                            {declarationLines.map((line, index) => (
+                                <div key={index} style={{ marginTop: index === 0 ? 0 : 4 }}>
+                                    {line}
+                                </div>
+                            ))}
                         </td>
                         <td width="32">&nbsp;</td>
                     </tr>
