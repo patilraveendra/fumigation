@@ -38,16 +38,18 @@ const NewAlpStart: React.FC = () => {
                                 <option key={reg.value} value={reg.value}>{reg.label}</option>
                             ))}
                         </select>
+                        {!registration ? <div className="form-text text-danger">DPPQS Registration is required.</div> : null}
                     </div>
                 </div>
                 <div className="row mb-3 align-items-center">
                     <div className="col-md-3 fw-bold">* Date Of Certificate :</div>
                     <div className="col-md-9">
                         <input type="date" className="form-control" value={date} onChange={e => setDate(e.target.value)} />
+                        {!date ? <div className="form-text text-danger">Date of certificate is required.</div> : null}
                     </div>
                 </div>
                 <div className="row mb-3 align-items-center">
-                    <div className="col-md-3 fw-bold">* Certificate No. :</div>
+                    <div className="col-md-3 fw-bold">Certificate No. :</div>
                     <div className="col-md-6">
                         <input type="text" className="form-control" value={certificateNo} onChange={e => setCertificateNo(e.target.value)} />
                     </div>
@@ -61,7 +63,7 @@ const NewAlpStart: React.FC = () => {
 
                 <div className="row">
                     <div className="col-md-12 text-end">
-                        <button className="btn btn-primary" onClick={handleStart} disabled={!registration || !date || !certificateNo}>Start</button>
+                        <button className="btn btn-primary" onClick={handleStart} disabled={!registration || !date}>Start</button>
                     </div>
                 </div>
             </div>

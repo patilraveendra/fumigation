@@ -32,6 +32,7 @@ const NewMbrStart: React.FC = () => {
                                     <option key={r.value} value={r.value}>{r.label}</option>
                                 ))}
                             </select>
+                            {!registration ? <div className="form-text text-danger">DPPQS Registration is required.</div> : null}
                         </div>
                     </div>
 
@@ -39,6 +40,7 @@ const NewMbrStart: React.FC = () => {
                         <label className="col-sm-3 col-form-label">Date Of Certificate</label>
                         <div className="col-sm-6">
                             <input type="date" className="form-control" value={date} onChange={(e) => setDate(e.target.value)} />
+                            {!date ? <div className="form-text text-danger">Date of certificate is required.</div> : null}
                         </div>
                     </div>
 
@@ -56,7 +58,7 @@ const NewMbrStart: React.FC = () => {
 
                     <div className="d-flex justify-content-end">
                         <button className="btn btn-secondary me-2" onClick={() => navigate(-1)}>Cancel</button>
-                        <button className="btn btn-primary" onClick={handleContinue}>Continue</button>
+                        <button className="btn btn-primary" onClick={handleContinue} disabled={!registration || !date}>Continue</button>
                     </div>
                 </div>
             </div>
