@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { DPPQS_REGISTRATIONS } from '../constants/mbrConstants';
+import { DPPQS_REGISTRATIONS_ALP } from '../constants/mbrConstants';
 
 const NewAlpStart: React.FC = () => {
     const navigate = useNavigate();
@@ -34,7 +34,7 @@ const NewAlpStart: React.FC = () => {
                     <div className="col-md-9">
                         <select className="form-select" value={registration} onChange={e => setRegistration(e.target.value)}>
                             <option value="">Select DPPQS Registration</option>
-                            {DPPQS_REGISTRATIONS.map((reg) => (
+                            {DPPQS_REGISTRATIONS_ALP.map((reg) => (
                                 <option key={reg.value} value={reg.value}>{reg.label}</option>
                             ))}
                         </select>
@@ -53,26 +53,12 @@ const NewAlpStart: React.FC = () => {
                     </div>
                     <div className="col-md-3">
                         <label className="form-check-label ms-2">
-                            <input type="checkbox" className="form-check-input me-2" disabled />Autogenerate Certificate Number On LOCK
+                            <input type="checkbox" className="form-check-input me-2" />Autogenerate Certificate Number On LOCK
                         </label>
                     </div>
                 </div>
-                <div className="row mb-3 align-items-center">
-                    <div className="col-md-3 fw-bold">Work Order :</div>
-                    <div className="col-md-9">-</div>
-                </div>
-                <div className="row mb-3 align-items-center">
-                    <div className="col-md-3 fw-bold">No Of Quantity:</div>
-                    <div className="col-md-9">
-                        <input type="text" className="form-control" value={noOfQuantity} onChange={e => setNoOfQuantity(e.target.value)} />
-                    </div>
-                </div>
-                <div className="row mb-3 align-items-center">
-                    <div className="col-md-3 fw-bold">Detail</div>
-                    <div className="col-md-9">
-                        <input type="text" className="form-control" value={detail} onChange={e => setDetail(e.target.value)} />
-                    </div>
-                </div>
+
+
                 <div className="row">
                     <div className="col-md-12 text-end">
                         <button className="btn btn-primary" onClick={handleStart} disabled={!registration || !date || !certificateNo}>Start</button>

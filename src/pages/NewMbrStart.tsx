@@ -47,6 +47,11 @@ const NewMbrStart: React.FC = () => {
                         <div className="col-sm-6">
                             <input className="form-control" value={certNumber} onChange={(e) => setCertNumber(e.target.value)} />
                         </div>
+                        <div className="col-md-3">
+                            <label className="form-check-label ms-2">
+                                <input type="checkbox" className="form-check-input me-2" />Autogenerate Certificate Number On LOCK
+                            </label>
+                        </div>
                     </div>
 
                     <div className="d-flex justify-content-end">
