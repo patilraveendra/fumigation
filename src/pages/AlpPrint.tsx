@@ -286,7 +286,12 @@ const AlpPrint: React.FC<AlpPrintProps> = ({ data }) => {
                                                     </tr>
                                                     <tr>
                                                         <td height="35" valign="middle" style={goodsLabelCell()}>Quantity (MTs)/No of Packages/No of Pieces :</td>
-                                                        <td height="35" valign="middle" style={goodsValueCell()}>{quantity}</td>
+                                                        <td height="35" valign="middle"
+                                                            style={{
+                                                                ...goodsValueCell(),
+                                                                whiteSpace: 'pre-wrap'
+                                                            }}
+                                                        >{quantity}</td>
                                                     </tr>
                                                     <tr>
                                                         <td height="35" valign="middle" style={goodsLabelCell()}>Description of Packaging Material :</td>

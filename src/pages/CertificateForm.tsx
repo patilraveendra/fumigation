@@ -456,7 +456,7 @@ function CertificateForm({ onLogout, onViewSaved, initialType, initialValues }: 
                                     />
                                 </div>
 
-                                {/* Row 5 */}
+                                {/* Row 5
                                 <div className="col-md-4">
                                     <label className="form-label">Commodity Quantity</label>
                                     <input
@@ -466,7 +466,7 @@ function CertificateForm({ onLogout, onViewSaved, initialType, initialValues }: 
                                         onChange={handleInputChange}
                                         className="form-control"
                                     />
-                                </div>
+                                </div>*/}
 
                                 <div className="col-md-4">
                                     <label className="form-label">Packaging Material</label>

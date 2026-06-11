@@ -295,7 +295,12 @@ const MbPrint: React.FC<MbPrintProps> = ({ data }) => {
                                     </tr>
                                     <tr>
                                         <td align="left" valign="top" style={cell('lbr')}>Quantity (MTs)/No of packages/No of pieces</td>
-                                        <td align="left" valign="top" style={cell('br')}>{quantity || '.'}</td>
+                                        <td align="left" valign="top"
+                                            style={{
+                                                ...cell('br'),
+                                                whiteSpace: 'pre-wrap'
+                                            }}
+                                        >{quantity || '.'}</td>
                                     </tr>
                                     <tr>
                                         <td width="22%" align="left" valign="top" style={cell('lbr')}>Description of packaging materials</td>
