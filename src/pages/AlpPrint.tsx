@@ -45,11 +45,25 @@ const AlpPrint: React.FC<AlpPrintProps> = ({ data }) => {
         })
         .filter(Boolean) as string[];
     const showContainerRow = containerRows.length > 0 && data.cnoat?.toLowerCase().includes('format');
+
+    const containers = data.containers ?? [];
+    const containercount = containers.length;
+    const ct20 = (data.ct20 || '').toString().trim();
+    const ct40 = (data.ct40 || '').toString().trim();
+
+    let selectedType = '';
+
+    if (ct20 && !ct40) selectedType = `20' ${ct20}`;
+    else if (ct40 && !ct20) selectedType = `40' ${ct40}`;
+    else if (ct20) selectedType = `20' ${ct20}`;
+
+    let containertype = selectedType ? `${containercount} X ${selectedType}` : '';
     const declarationLines = [
         declaration,
         isAdditionalFlag(data.cnoat) && containerRows.length > 0
-            ? `Container Number (or numerical link) / Seal Number: ${containerRows.join(', ')}`
+            ? `ABOVE MENTIONED CARGO IS SAID TO STUFFED IN CONTAINER NO.: ${containerRows.join(', ')}`
             : undefined,
+        isAdditionalFlag(data.cnoat) && containertype ? ` ${containertype}` : undefined
     ].filter(Boolean) as string[];
     const humidityVal = value(data.humidity);
     const tempVal = value(data.temperature, data.f_temperature);

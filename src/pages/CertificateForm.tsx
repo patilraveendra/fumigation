@@ -318,7 +318,7 @@ function CertificateForm({ onLogout, onViewSaved, initialType, initialValues }: 
                 )}
                 <div className="row">
                     <div className="col-12">
-                        <div className="card mb-3 two-column">
+                        <div className="card mb-3">
                             <div className="card-header">Certificate Details</div>
                             <div className="card-body">
                                 <div className="certificate-inline-row">
@@ -374,7 +374,7 @@ function CertificateForm({ onLogout, onViewSaved, initialType, initialValues }: 
                                     </button>
                                 </div>
 
-                                {/* Row 2 */}
+                                {/* Exporter Name (keeps its column) */}
                                 <div className="col-md-6">
                                     <label className="form-label">Exporter Name</label>
                                     <input
@@ -386,49 +386,49 @@ function CertificateForm({ onLogout, onViewSaved, initialType, initialValues }: 
                                     />
                                 </div>
 
-                                <div className="col-md-6">
-                                    <label className="form-label">Exporter Invoice No & Date</label>
-                                    <input
-                                        type="text"
-                                        name="invoiceno"
-                                        value={data.invoiceno}
-                                        onChange={handleInputChange}
-                                        className="form-control"
-                                    />
-                                </div>
+                                {/* Force two-column layout: left = Exporter (invoice + address), right = Consignee (name + address) */}
+                                <div className="col-12">
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                                        <div>
+                                            <label className="form-label">Exporter Invoice No & Date</label>
+                                            <input
+                                                type="text"
+                                                name="invoiceno"
+                                                value={data.invoiceno}
+                                                onChange={handleInputChange}
+                                                className="form-control"
+                                            />
 
-                                {/* Row 3 */}
-                                <div className="col-md-6">
-                                    <label className="form-label">Exporter Address</label>
-                                    <textarea
-                                        name="d_address"
-                                        value={data.d_address}
-                                        onChange={handleInputChange}
-                                        className="form-control"
-                                        rows={3}
-                                    />
-                                </div>
+                                            <label className="form-label mt-3">Exporter Address</label>
+                                            <textarea
+                                                name="d_address"
+                                                value={data.d_address}
+                                                onChange={handleInputChange}
+                                                className="form-control"
+                                                rows={3}
+                                            />
+                                        </div>
 
-                                <div className="col-md-6">
-                                    <label className="form-label">Consignee Name</label>
-                                    <input
-                                        type="text"
-                                        name="consigneeName"
-                                        value={data.consigneeName}
-                                        onChange={handleInputChange}
-                                        className="form-control"
-                                    />
+                                        <div>
+                                            <label className="form-label">Consignee Name</label>
+                                            <input
+                                                type="text"
+                                                name="consigneeName"
+                                                value={data.consigneeName}
+                                                onChange={handleInputChange}
+                                                className="form-control"
+                                            />
 
-                                    <label className="form-label mt-2">
-                                        Address of Consignee
-                                    </label>
-                                    <textarea
-                                        name="c_address"
-                                        value={data.c_address}
-                                        onChange={handleInputChange}
-                                        className="form-control"
-                                        rows={3}
-                                    />
+                                            <label className="form-label mt-3">Address of Consignee</label>
+                                            <textarea
+                                                name="c_address"
+                                                value={data.c_address}
+                                                onChange={handleInputChange}
+                                                className="form-control"
+                                                rows={3}
+                                            />
+                                        </div>
+                                    </div>
                                 </div>
 
                                 {/* Row 4 */}
@@ -729,14 +729,16 @@ function CertificateForm({ onLogout, onViewSaved, initialType, initialValues }: 
                                         <option value="No">No</option>
                                     </select>
                                 </div>
-                                <div className="col-md-4">
-                                    <label className="form-label">Fumigation Carried Out In</label>
-                                    <select name="fcoi" value={data.fcoi} onChange={handleInputChange} className="form-select">
-                                        <option value=""></option>
-                                        <option value="NSPM 12 AND ISPM 15 REGULATION OF IPPC">NSPM 12 AND ISPM 15 REGULATION OF IPPC</option>
-                                        <option value="NSPM 12">NSPM 12</option>
-                                    </select>
-                                </div>
+                                {isMb ? (
+                                    <div className="col-md-4">
+                                        <label className="form-label">Fumigation Carried Out In</label>
+                                        <select name="fcoi" value={data.fcoi} onChange={handleInputChange} className="form-select">
+                                            <option value=""></option>
+                                            <option value="NSPM 12 AND ISPM 15 REGULATION OF IPPC">NSPM 12 AND ISPM 15 REGULATION OF IPPC</option>
+                                            <option value="NSPM 12">NSPM 12</option>
+                                        </select>
+                                    </div>
+                                ) : null}
                             </div>
                         </div>
                     </div>
