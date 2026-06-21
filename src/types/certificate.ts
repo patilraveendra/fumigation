@@ -71,4 +71,25 @@ export interface CertificateData {
     declaration?: string;
     oremark?: string;
     invoiceno?: string;
+    // AUS/extra fields
+    workOrder?: string;
+    other?: string;
+    consignmentLink?: string;
+    placeAddress?: string;
+    placeCity?: string;
+    placeCountry?: string;
+    placePostcode?: string;
+    f_starttime?: string;
+    f_endtime?: string;
+    f_date_completed?: string;
+    f_time?: string;
+    f_doserate2?: string;
+    f_dosetype2?: string;
+    f_duration2?: string;
+    f_temperature2?: string;
+    fcd1?: boolean;
+    fcd2?: boolean;
+    fcd3?: boolean;
+    fcd4?: string;
+    ventilation?: string;
 }

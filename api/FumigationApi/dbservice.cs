@@ -5,8 +5,10 @@ public interface IDatabaseService
 {
     Task<MbCertificate> SaveMbCertificateAsync(MbCertificate record);
     Task<AlpCertificate> SaveAlpCertificateAsync(AlpCertificate record);
+    Task<AusCertificate> SaveAusCertificateAsync(AusCertificate record);
     Task<List<MbCertificate>> GetAllMbCertificatesAsync();
     Task<List<AlpCertificate>> GetAllAlpCertificatesAsync();
+    Task<List<AusCertificate>> GetAllAusCertificatesAsync();
 }
 
 public class DatabaseService : IDatabaseService
@@ -78,6 +80,38 @@ public class DatabaseService : IDatabaseService
         return record;
     }
 
+    public async Task<AusCertificate> SaveAusCertificateAsync(AusCertificate record)
+    {
+        try
+        {
+            var parts = new[] { record.FDoserate, record.FDosetype };
+            record.DoseRate = string.Join(' ', parts.Where(p => !string.IsNullOrWhiteSpace(p))).Trim();
+        }
+        catch { }
+
+        if (record.CertificateId > 0)
+        {
+            var existing = await _context.AusCertificates.Include(c => c.Containers).FirstOrDefaultAsync(c => c.CertificateId == record.CertificateId);
+            if (existing != null)
+            {
+                _context.Entry(existing).CurrentValues.SetValues(record);
+                existing.UpdatedDate = DateTime.Now;
+
+                _context.AusContainers.RemoveRange(existing.Containers);
+                existing.Containers = record.Containers ?? new List<AusContainer>();
+
+                await _context.SaveChangesAsync();
+                return existing;
+            }
+        }
+
+        record.CreatedDate = DateTime.Now;
+        record.UpdatedDate = DateTime.Now;
+        _context.AusCertificates.Add(record);
+        await _context.SaveChangesAsync();
+        return record;
+    }
+
     public async Task<List<MbCertificate>> GetAllMbCertificatesAsync()
     {
         return await _context.MbCertificates
@@ -89,6 +123,14 @@ public class DatabaseService : IDatabaseService
     public async Task<List<AlpCertificate>> GetAllAlpCertificatesAsync()
     {
         return await _context.AlpCertificates
+            .Include(c => c.Containers)
+            .OrderByDescending(c => c.CreatedDate)
+            .ToListAsync();
+    }
+
+    public async Task<List<AusCertificate>> GetAllAusCertificatesAsync()
+    {
+        return await _context.AusCertificates
             .Include(c => c.Containers)
             .OrderByDescending(c => c.CreatedDate)
             .ToListAsync();

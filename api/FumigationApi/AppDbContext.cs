@@ -8,6 +8,8 @@ public class AppDbContext : DbContext
     public DbSet<MbContainer> MbContainers { get; set; }
     public DbSet<AlpCertificate> AlpCertificates { get; set; }
     public DbSet<AlpContainer> AlpContainers { get; set; }
+    public DbSet<AusCertificate> AusCertificates { get; set; }
+    public DbSet<AusContainer> AusContainers { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -15,6 +17,8 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<MbContainer>().ToTable("MB_Containers");
         modelBuilder.Entity<AlpCertificate>().ToTable("ALP_Certificates");
         modelBuilder.Entity<AlpContainer>().ToTable("ALP_Containers");
+        modelBuilder.Entity<AusCertificate>().ToTable("AUS_Certificates");
+        modelBuilder.Entity<AusContainer>().ToTable("AUS_Containers");
 
         modelBuilder.Entity<MbContainer>()
             .HasOne(c => c.Certificate)
@@ -23,6 +27,12 @@ public class AppDbContext : DbContext
             .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<AlpContainer>()
+            .HasOne(c => c.Certificate)
+            .WithMany(a => a.Containers)
+            .HasForeignKey(c => c.CertificateId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<AusContainer>()
             .HasOne(c => c.Certificate)
             .WithMany(a => a.Containers)
             .HasForeignKey(c => c.CertificateId)

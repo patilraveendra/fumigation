@@ -27,6 +27,21 @@ const AusPrint: React.FC<AusPrintProps> = ({ data }) => {
     const exporterName = value(data.d_name, data.exporterName);
     const consigneeName = value(data.c_name, data.consigneeName);
     const quantity = value(data.quantityDeclared, data.commodityQuantity, data.noOfQuantity);
+    const portOfLoading = value(data.portOfLoading);
+    const countryOfOrigin = value(data.countryOfOrigin);
+    const exporterInvoice = value(data.invoiceno, data.invoiceNumber);
+    const exporterAddress = value(data.d_address);
+    const placeAddress = value(data.d_address);
+    const placeCity = value(data.c_address);
+    const placePostcode = value((data as any).placePostcode, (data as any).postcode);
+    const DAWR = value(data.f_doserate, data.doseRate);
+    const exposure = value(data.exposurePeriod, data.exposurePeriod || data.f_duration || data.f_duration_days);
+    const enclosureType = value(data.f_performed, data.gasTightSheets);
+    const finalTlv = value(data.finalTlvReading, data.finalTlvReading || data.finalTlvReading);
+    const containerPlace = value(data.cnoat);
+    const additionalDeclaration = value(data.declaration, data.declarationText);
+    const officeRemark = value(data.oremark);
+    const workOrder = value((data as any).workOrder, data.detail);
 
     const td: React.CSSProperties = {
         fontFamily: 'Arial, Helvetica, sans-serif',
@@ -61,7 +76,7 @@ const AusPrint: React.FC<AusPrintProps> = ({ data }) => {
             </style>
             <table
                 className="aus-print-wrap"
-                width="804"
+                width="100%"
                 align="center"
                 cellPadding={0}
                 cellSpacing={0}
@@ -69,112 +84,149 @@ const AusPrint: React.FC<AusPrintProps> = ({ data }) => {
             >
                 <tbody>
                     <tr>
-                        <td width="47" rowSpan={4} align="left" valign="middle" />
-                        <td width="713" height="100">
-                            <table width="100%" cellPadding={0} cellSpacing={0} style={{ borderCollapse: 'collapse' }}>
+                        <td colSpan={2}>
+                            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                                 <tbody>
                                     <tr>
-                                        <td colSpan={4}>
-                                            <br /><br /><br /><br /><br /><br /><br />
+                                        <td style={{ padding: 10 }}>
+                                            <div style={{ fontSize: 24, color: '#4d86b5', fontWeight: 600 }}>AUS Certificate <span style={{ fontSize: 16, color: '#777', fontWeight: 400 }}>»New AUS</span></div>
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td colSpan={4}>
-                                            <table style={{ width: '100%', borderCollapse: 'collapse' }} align="center" cellPadding={0} cellSpacing={0}>
+                                        <td>
+                                            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                                                 <tbody>
                                                     <tr>
-                                                        <td colSpan={2} rowSpan={2} align="left" valign="top" style={cell('ltrb', { textAlign: 'justify' })}>
-                                                            PEST AND SOLUTIONS<br />
-                                                            721, Commodity Exchange Building, Sector 19,
-                                                            Vashi, NAVI MUMBAI-400 703. Maharashtra INDIA.
-
-                                                            <strong>
-                                                                Dte PPQS Regd. No :IN-AUS-MUM0001
-                                                            </strong>
-                                                        </td>
-                                                        <td width="50%" height="35" colSpan={2} style={cell('tr')}>
-                                                            Treatment Certificate Number :&nbsp; {value(data.certificateNumber)}
-                                                        </td>
+                                                        <td style={cell('l')}>* Treatment Certificate No :</td>
+                                                        <td style={cell('r')}>{value(data.certificateNumber)}</td>
+                                                        <td style={cell('l')}>* Date Of Certificate :</td>
+                                                        <td style={cell('r')}>{formatDate(value(data.dateIssued))}</td>
                                                     </tr>
                                                     <tr>
-                                                        <td height="35" colSpan={2} style={cell('trb')}>
-                                                            Date of Issue : &nbsp; {formatDate(value(data.dateIssued))}
-                                                        </td>
+                                                        <td style={cell('l')}>* DPPQS Registration No :</td>
+                                                        <td style={cell('r')}>{value(data.providerId, data.accreditationNumber)}</td>
+                                                        <td style={cell('l')}>Work Order :</td>
+                                                        <td style={cell('r')}>{workOrder}</td>
                                                     </tr>
                                                 </tbody>
                                             </table>
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td height="35" colSpan={4} style={{ paddingTop: 12, fontFamily: 'Georgia, "Times New Roman", Times, serif', fontSize: 14, color: '#333', textAlign: 'justify', fontStyle: 'italic', letterSpacing: 1, lineHeight: 1.12 }}>
-                                            <em>
-                                                &nbsp;&nbsp;&nbsp;&nbsp;This is to certify that the goods described below were treated in accordance with the fumigation treatment requirements of importing country <strong>{destinationCountry}</strong>.
-                                            </em>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td height="35" colSpan={4} align="center" valign="middle" style={{ borderBottom: '1px solid #666', padding: 22 }}>
-                                            <strong>DETAILS OF TREATMENT</strong>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td colSpan={4}>
-                                            <table style={{ width: '100%', borderCollapse: 'collapse' }} align="center" cellPadding={0} cellSpacing={0}>
+                                        <td style={{ paddingTop: 10 }}>
+                                            <div style={{ textAlign: 'center', fontWeight: 700, padding: 8, borderTop: '1px solid #ccc', borderBottom: '1px solid #666' }}>TARGET OF FUMIGATION DETAIL</div>
+                                            <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: 8 }}>
                                                 <tbody>
                                                     <tr>
-                                                        <td width="28%" height="35" style={cell('lb')}>Name of Fumigant :</td>
-                                                        <td width="22%" style={cell('lbr')}>{value(data.f_type, data.fumigantName)}</td>
-                                                        <td width="32%" height="35" style={cell('b')}>Date of Fumigation :</td>
-                                                        <td width="18%" style={cell('blr')}>{formatDate(value(data.f_date, data.fumigationStarted))}</td>
+                                                        <td style={cell('l')}>* Target of Fumigation :</td>
+                                                        <td style={cell('r')}>{data.commodityDescription ? '☑ Commodity' : '☐ Commodity'} &nbsp; {data.containers && data.containers.length ? '☑ Container' : '☐ Container'} &nbsp; {data.packagingMaterial ? '☑ Packing' : '☐ Packing'}</td>
+                                                        <td style={cell('l')}>Other:</td>
+                                                        <td style={cell('r')}>{value((data as any).other)}</td>
                                                     </tr>
                                                     <tr>
-                                                        <td height="35" style={cell('lb')}>Place of Fumigation :</td>
-                                                        <td height="35" style={cell('lbr')}>&nbsp;{value(data.f_place, data.placeOfFumigation)}</td>
-                                                        <td height="35" style={cell('b')}>Dosage of Fumigant :</td>
-                                                        <td height="35" style={cell('blr')}>&nbsp;{dosage}</td>
+                                                        <td style={cell('l')}>* Commodity :</td>
+                                                        <td colSpan={3} style={cell('r')}>{value(data.commodityDescription)}</td>
                                                     </tr>
                                                     <tr>
-                                                        <td height="35" colSpan={2} style={cell('lbr')}>Duration of Fumigation :</td>
-                                                        <td height="35" colSpan={2} style={cell('br')}>{duration}</td>
+                                                        <td style={cell('l')}>* Quantity declared :</td>
+                                                        <td style={cell('r')}>{value(data.quantityDeclared, data.commodityQuantity)}</td>
+                                                        <td style={cell('l')}>* No Of Quantity:</td>
+                                                        <td style={cell('r')}>{value(data.noOfQuantity)}</td>
                                                     </tr>
                                                     <tr>
-                                                        <td height="35" colSpan={2} style={cell('lbr')}>Average ambient humidity during fumigation :</td>
-                                                        <td height="35" colSpan={2} style={cell('br')}>{value(data.humidity)}</td>
+                                                        <td style={cell('l')}>Consignment Link :</td>
+                                                        <td style={cell('r')}>{value((data as any).consignmentLink)}</td>
+                                                        <td style={cell('l')}>* Country of origin :</td>
+                                                        <td style={cell('r')}>{countryOfOrigin}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style={cell('l')}>* Port of Loading :</td>
+                                                        <td style={cell('r')}>{portOfLoading}</td>
+                                                        <td style={cell('l')}>* Country of Destination :</td>
+                                                        <td style={cell('r')}>{destinationCountry}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style={cell('l')}>* Name of Exporter :</td>
+                                                        <td style={cell('r')}>{exporterName}</td>
+                                                        <td style={cell('l')}>* Exporter Invoice No :</td>
+                                                        <td style={cell('r')}>{exporterInvoice}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style={cell('l')}>Name of Exporter</td>
+                                                        <td style={cell('r')}>{exporterName}</td>
+                                                        <td style={cell('l')}>Address of Exporter</td>
+                                                        <td style={cell('r')}>{exporterAddress}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style={cell('l')}>Place Address</td>
+                                                        <td style={cell('r')}>{placeAddress}</td>
+                                                        <td style={cell('l')}>Place City</td>
+                                                        <td style={cell('r')}>{placeCity}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style={cell('l')}>Place Country</td>
+                                                        <td style={cell('r')}>{value(data.countryOfOrigin)}</td>
+                                                        <td style={cell('l')}>Place Postcode</td>
+                                                        <td style={cell('r')}>{placePostcode}</td>
                                                     </tr>
                                                 </tbody>
                                             </table>
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td height="35" colSpan={4} align="center" valign="middle" style={{ borderBottom: '1px solid #666', padding: 22 }}>
-                                            <strong>DESCRIPTION OF GOODS</strong>
+                                        <td style={{ paddingTop: 12 }}>
+                                            <div style={{ textAlign: 'center', fontWeight: 700, padding: 8, borderTop: '1px solid #ccc', borderBottom: '1px solid #666' }}>TREATMENT DETAILS</div>
+                                            <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: 8 }}>
+                                                <tbody>
+                                                    <tr>
+                                                        <td style={cell('l')}>Date of Fumigation Commenced</td>
+                                                        <td style={cell('r')}>{formatDate(value(data.fumigationStarted, data.f_date))}</td>
+                                                        <td style={cell('l')}>Time of Fumigation Commenced</td>
+                                                        <td style={cell('r')}>{value((data as any).f_starttime)}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style={cell('l')}>Date of Fumigation Completed</td>
+                                                        <td style={cell('r')}>{formatDate(value(data.fumigationCompleted, (data as any).f_date_completed))}</td>
+                                                        <td style={cell('l')}>Time of Fumigation Completed</td>
+                                                        <td style={cell('r')}>{value((data as any).f_endtime)}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style={cell('l')}>* DAWR prescribed dose rate (g/m3) :</td>
+                                                        <td style={cell('r')}>{DAWR}</td>
+                                                        <td style={cell('l')}>* Exposure period (hrs) :</td>
+                                                        <td style={cell('r')}>{exposure}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style={cell('l')}>* Forecast minimum temp (C) :</td>
+                                                        <td style={cell('r')}>{value(data.temperature)}</td>
+                                                        <td style={cell('l')}>* Applied Dosage rate (g/m3):</td>
+                                                        <td style={cell('r')}>{dosage}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style={cell('l')}>* Enclosure Type :</td>
+                                                        <td style={cell('r')}>{enclosureType}</td>
+                                                        <td style={cell('l')}>Consignment Link / Container No</td>
+                                                        <td style={cell('r')}>Click To Add Container Number</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td colSpan={4}>
-                                            <table style={{ width: '100%', borderCollapse: 'collapse' }} align="center" cellPadding={0} cellSpacing={0}>
+                                        <td style={{ paddingTop: 12 }}>
+                                            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                                                 <tbody>
                                                     <tr>
-                                                        <td height="35" style={cell('lbr', { width: '34%' })}>Name &amp; Address of Exporter :</td>
-                                                        <td height="35" style={cell('br', { width: '66%' })}>
-                                                            {exporterName}<br />{value(data.d_address)}
-                                                        </td>
+                                                        <td style={cell('l')}>* Ventilation Final TLV reading(ppm) :</td>
+                                                        <td style={cell('r')}>{finalTlv || '00 PPM'}</td>
+                                                        <td style={cell('l')}>* Container No. Place :</td>
+                                                        <td style={cell('r')}>{containerPlace || 'In Additional Declaration'}</td>
                                                     </tr>
                                                     <tr>
-                                                        <td height="35" style={cell('lbr')}>Name &amp; Address of consignee :</td>
-                                                        <td height="35" style={cell('br')}>
-                                                            {consigneeName}<br />{value(data.c_address)}
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td height="35" valign="middle" style={cell('lbr')}>Type &amp; Description Of Cargo :</td>
-                                                        <td height="35" valign="middle" style={cell('br')}>
-                                                            {value(data.marks, data.commodityDescription)}
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td height="35" valign="middle" style={cell('lbr')}>Quantity (MTs)/No of Packages/No of Pieces :</td>
-                                                        <td height="35" valign="middle" style={cell('br')}>{quantity}</td>
+                                                        <td style={cell('l')}>* Additional Declaration :</td>
+                                                        <td style={cell('r')}>{additionalDeclaration}</td>
+                                                        <td style={cell('l')}>Office Remark</td>
+                                                        <td style={cell('r')}>{officeRemark}</td>
                                                     </tr>
                                                 </tbody>
                                             </table>
@@ -183,7 +235,6 @@ const AusPrint: React.FC<AusPrintProps> = ({ data }) => {
                                 </tbody>
                             </table>
                         </td>
-                        <td>&nbsp;</td>
                     </tr>
                     <tr>
                         <td height="35" align="left" valign="middle" style={cell('', { padding: 5 })}>

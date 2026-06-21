@@ -55,19 +55,40 @@ const initialData: CertificateData = {
     c_name: '',
     c_address: '',
     notify: '',
+    // AUS-specific fields
+    workOrder: '',
+    other: '',
+    consignmentLink: '',
+    placeAddress: '',
+    placeCity: '',
+    placeCountry: '',
+    placePostcode: '',
+    f_starttime: '',
+    f_endtime: '',
     f_type: '',
     f_date: '',
+    f_date_completed: '',
+    f_time: '',
     f_place: '',
     f_doserate: '',
     f_dosetype: '',
+    f_doserate2: '',
+    f_dosetype2: '',
     f_duration: '',
+    f_duration2: '',
     f_duration_days: '',
     f_duration_hours: '',
     f_hour: '',
     f_temperature: '',
+    f_temperature2: '',
     f_ttype: '',
     f_performed: 'Yes',
     f_airspace: 'N/A',
+    fcd1: false,
+    fcd2: false,
+    fcd3: false,
+    fcd4: '',
+    ventilation: '',
     fcoi: '',
     phnph: '',
     cnoat: '',
@@ -369,6 +390,13 @@ function CertificateForm({ onLogout, onViewSaved, initialType, initialValues }: 
                                     <button
                                         type="button"
                                         className="btn btn-outline-secondary w-100"
+                                        onClick={() => {
+                                            // toggle edit flow: prompt for work order
+                                            const wo = prompt('Enter Work Order or leave blank');
+                                            if (wo !== null) {
+                                                setData(prev => ({ ...prev, workOrder: wo } as CertificateData));
+                                            }
+                                        }}
                                     >
                                         Select / Edit
                                     </button>
@@ -625,6 +653,24 @@ function CertificateForm({ onLogout, onViewSaved, initialType, initialValues }: 
                                         </div>
                                     ))}
                                 </div>
+
+                                {/* AUS extra address fields */}
+                                {data.certificateType === 'AUS' && (
+                                    <>
+                                        <div className="col-md-4">
+                                            <label className="form-label">Place Address</label>
+                                            <input type="text" name="d_address" value={data.d_address} onChange={handleInputChange} className="form-control" />
+                                        </div>
+                                        <div className="col-md-4">
+                                            <label className="form-label">Place City</label>
+                                            <input type="text" name="placeCity" value={(data as any).placeCity} onChange={handleInputChange} className="form-control" />
+                                        </div>
+                                        <div className="col-md-4">
+                                            <label className="form-label">Place Postcode</label>
+                                            <input type="text" name="placePostcode" value={(data as any).placePostcode} onChange={handleInputChange} className="form-control" />
+                                        </div>
+                                    </>
+                                )}
 
                             </div>
                         </div>
