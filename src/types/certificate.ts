@@ -1,4 +1,4 @@
-export type CertificateType = 'ALP' | 'MB';
+export type CertificateType = 'ALP' | 'MB' | 'AUS';
 
 export type GasTightSheetsOption = 'Yes' | 'No';
 

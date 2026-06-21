@@ -157,7 +157,7 @@ function formatAlpDuration(days?: string, hours?: string) {
 interface CertificateFormProps {
     onLogout?: () => void;
     onViewSaved?: () => void;
-    initialType?: 'MB' | 'ALP';
+    initialType?: 'MB' | 'ALP' | 'AUS';
     initialValues?: Partial<CertificateData>;
 }
 
@@ -211,15 +211,15 @@ function CertificateForm({ onLogout, onViewSaved, initialType, initialValues }: 
         const value = event.target.value;
 
         if (name === 'certificateType') {
-            const nextFumigantOptions = value === 'ALP' ? alpFumigantOptions : mbFumigantOptions;
-            const nextDosageOptions = value === 'ALP' ? alpDosageTypeOptions : mbDosageTypeOptions;
+            const nextFumigantOptions = value === 'ALP' || value === 'AUS' ? alpFumigantOptions : mbFumigantOptions;
+            const nextDosageOptions = value === 'ALP' || value === 'AUS' ? alpDosageTypeOptions : mbDosageTypeOptions;
 
             setData((prev) => ({
                 ...prev,
                 certificateType: value,
                 f_type: nextFumigantOptions.includes(prev.f_type ?? '') ? prev.f_type : nextFumigantOptions[0],
                 f_dosetype: nextDosageOptions.some((option) => option.value === prev.f_dosetype) ? prev.f_dosetype : nextDosageOptions[0].value,
-                f_hour: value === 'ALP'
+                f_hour: value === 'ALP' || value === 'AUS'
                     ? ''
                     : (mbDurationUnitOptions.some((option) => option.value === prev.f_hour) ? prev.f_hour : mbDurationUnitOptions[0].value),
             } as CertificateData));

@@ -11,7 +11,9 @@ export type CertificateRecord = {
 export async function saveCertificate(data: CertificateData) {
     const endpoint = data.certificateType === 'MB'
         ? `${apiBaseUrl}/api/mb/certificates`
-        : `${apiBaseUrl}/api/alp/certificates`;
+        : data.certificateType === 'AUS'
+            ? `${apiBaseUrl}/api/aus/certificates`
+            : `${apiBaseUrl}/api/alp/certificates`;
 
     try {
         const response = await fetch(endpoint, {
@@ -56,10 +58,11 @@ export async function debugServer() {
 
 export async function fetchCertificates() {
     try {
-        // Fetch MB and ALP certificates in parallel from SQL-backed endpoints
-        const [mbRes, alpRes] = await Promise.all([
+        // Fetch MB, ALP and AUS certificates in parallel from SQL-backed endpoints
+        const [mbRes, alpRes, ausRes] = await Promise.all([
             fetch(`${apiBaseUrl}/api/mb/certificates`),
             fetch(`${apiBaseUrl}/api/alp/certificates`),
+            fetch(`${apiBaseUrl}/api/aus/certificates`),
         ]);
 
         if (!mbRes.ok) {
@@ -70,9 +73,14 @@ export async function fetchCertificates() {
             const text = await alpRes.text();
             throw new Error(`API error (${alpRes.status}): ${text || alpRes.statusText}`);
         }
+        if (!ausRes.ok) {
+            const text = await ausRes.text();
+            throw new Error(`API error (${ausRes.status}): ${text || ausRes.statusText}`);
+        }
 
         const mbList = (await mbRes.json()) as any[];
         const alpList = (await alpRes.json()) as any[];
+        const ausList = (await ausRes.json()) as any[];
 
         // Debug log the raw API responses for troubleshooting
         console.debug('fetchCertificates: mbList sample', mbList?.slice?.(0, 2));
@@ -99,7 +107,7 @@ export async function fetchCertificates() {
         mbList.forEach(normalizeContainers);
         alpList.forEach(normalizeContainers);
 
-        const mapRecord = (item: any, type: 'MB' | 'ALP') => ({
+        const mapRecord = (item: any, type: 'MB' | 'ALP' | 'AUS') => ({
             id: `${type}-${item.certificateId ?? item.certificateID ?? item.id ?? Math.random()}`,
             createdAtUtc: (item.createdDate ?? item.createdAtUtc ?? new Date()).toString(),
             data: { ...item } as Partial<CertificateData>,
@@ -108,6 +116,7 @@ export async function fetchCertificates() {
         const combined = [
             ...mbList.map((i) => mapRecord(i, 'MB')),
             ...alpList.map((i) => mapRecord(i, 'ALP')),
+            ...ausList.map((i) => mapRecord(i, 'AUS')),
         ];
 
         // sort by createdAtUtc desc

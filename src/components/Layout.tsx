@@ -24,6 +24,9 @@ const Layout: React.FC<{ children: React.ReactNode; onLogout?: () => void }> = (
                         <li className="nav-item">
                             <Link to="/create/alp" className="nav-link text-light small">Create ALP Certificate</Link>
                         </li>
+                        <li className="nav-item">
+                            <Link to="/create/aus" className="nav-link text-light small">Create AUS Certificate</Link>
+                        </li>
                     </ul>
                 </li>
                 <li className="nav-item">
@@ -34,6 +37,9 @@ const Layout: React.FC<{ children: React.ReactNode; onLogout?: () => void }> = (
                         </li>
                         <li className="nav-item">
                             <Link to="/list/alp" className="nav-link text-light small">ALP Certificates</Link>
+                        </li>
+                        <li className="nav-item">
+                            <Link to="/list/aus" className="nav-link text-light small">AUS Certificates</Link>
                         </li>
                     </ul>
                 </li>

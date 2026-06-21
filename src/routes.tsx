@@ -16,6 +16,9 @@ import AlpDashboard from "./pages/AlpDashboard";
 import CreateMbrForm from "./pages/CreateMbrForm";
 import PrintCertificate from "./pages/PrintCertificate";
 import NewAlpStart from "./pages/NewAlpStart";
+import NewAusStart from "./pages/NewAusStart";
+import CreateAusForm from "./pages/CreateAusForm";
+import AusCertificates from "./pages/AusCertificates";
 import Dashboard from "./pages/Dashboard";
 
 function AppRoutes({ isAuthenticated, setIsAuthenticated }: { isAuthenticated: boolean; setIsAuthenticated: (v: boolean) => void }) {
@@ -54,6 +57,14 @@ function AppRoutes({ isAuthenticated, setIsAuthenticated }: { isAuthenticated: b
                         }
                     />
                     <Route
+                        path="/list/aus"
+                        element={
+                            <Layout onLogout={() => { setIsAuthenticated(false); navigate('/'); }}>
+                                <AusCertificates onLogout={() => { setIsAuthenticated(false); navigate('/'); }} onBack={() => { navigate('/form'); }} />
+                            </Layout>
+                        }
+                    />
+                    <Route
                         path="/create/mbr"
                         element={
                             <Layout onLogout={() => { setIsAuthenticated(false); navigate('/'); }}>
@@ -78,10 +89,26 @@ function AppRoutes({ isAuthenticated, setIsAuthenticated }: { isAuthenticated: b
                         }
                     />
                     <Route
+                        path="/create/aus"
+                        element={
+                            <Layout onLogout={() => { setIsAuthenticated(false); navigate('/'); }}>
+                                <NewAusStart />
+                            </Layout>
+                        }
+                    />
+                    <Route
                         path="/create/alp/form"
                         element={
                             <Layout onLogout={() => { setIsAuthenticated(false); navigate('/'); }}>
                                 <CreateAlpForm />
+                            </Layout>
+                        }
+                    />
+                    <Route
+                        path="/create/aus/form"
+                        element={
+                            <Layout onLogout={() => { setIsAuthenticated(false); navigate('/'); }}>
+                                <CreateAusForm />
                             </Layout>
                         }
                     />

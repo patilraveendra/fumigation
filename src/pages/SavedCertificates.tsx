@@ -10,7 +10,7 @@ import './CertificateForm.compact.css';
 interface SavedCertificatesProps {
     onBack: () => void;
     onLogout?: () => void;
-    initialType?: 'MB' | 'ALP';
+    initialType?: 'MB' | 'ALP' | 'AUS';
 }
 
 function getPartyName(data: Partial<CertificateData>) {
@@ -22,7 +22,7 @@ function SavedCertificates({ onBack, onLogout, initialType }: SavedCertificatesP
     const [selectedRecordId, setSelectedRecordId] = useState<string>('');
     const [status, setStatus] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
-    const [selectedType, setSelectedType] = useState<'MB' | 'ALP'>(initialType ?? 'MB');
+    const [selectedType, setSelectedType] = useState<'MB' | 'ALP' | 'AUS'>(initialType ?? 'MB');
 
     useEffect(() => {
         const load = async () => {
@@ -77,8 +77,10 @@ function SavedCertificates({ onBack, onLogout, initialType }: SavedCertificatesP
 
     const handleEdit = (record: CertificateRecord) => {
         try {
-            const type = (record.data.certificateType ?? 'MB') as 'MB' | 'ALP';
-            const path = type === 'ALP' ? '/create/alp/form' : '/create/mbr/form';
+            const type = (record.data.certificateType ?? 'MB') as 'MB' | 'ALP' | 'AUS';
+            let path = '/create/mbr/form';
+            if (type === 'ALP') path = '/create/alp/form';
+            if (type === 'AUS') path = '/create/aus/form';
             navigate(path, { state: { initialValues: record.data } });
         } catch (e) {
             console.error('Failed to open edit form', e);
@@ -110,6 +112,11 @@ function SavedCertificates({ onBack, onLogout, initialType }: SavedCertificatesP
                     <li className="nav-item">
                         <button className={`nav-link ${selectedType === 'ALP' ? 'active' : ''}`} onClick={() => setSelectedType('ALP')}>
                             ALP Certificates <span className="badge bg-light text-dark ms-2">{records.filter(r => r.data.certificateType === 'ALP').length}</span>
+                        </button>
+                    </li>
+                    <li className="nav-item">
+                        <button className={`nav-link ${selectedType === 'AUS' ? 'active' : ''}`} onClick={() => setSelectedType('AUS')}>
+                            AUS Certificates <span className="badge bg-light text-dark ms-2">{records.filter(r => r.data.certificateType === 'AUS').length}</span>
                         </button>
                     </li>
                 </ul>
