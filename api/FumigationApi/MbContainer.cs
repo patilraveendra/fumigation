@@ -318,6 +318,31 @@ public class AusCertificate
 
     public string? FumigationCarriedOutIn { get; set; }
 
+    // AUS form fields
+    public string? workOrder { get; set; }
+    public string? other { get; set; }
+    public string? consignmentLink { get; set; }
+    public string? placeAddress { get; set; }
+    public string? placeCity { get; set; }
+    public string? placeCountry { get; set; }
+    public string? placePostcode { get; set; }
+    public bool? targetCommodity { get; set; }
+    public bool? targetContainer { get; set; }
+    public bool? targetPacking { get; set; }
+    public string? f_starttime { get; set; }
+    public string? f_endtime { get; set; }
+    public string? f_date_completed { get; set; }
+    public string? f_time { get; set; }
+    public string? f_doserate2 { get; set; }
+    public string? f_dosetype2 { get; set; }
+    public string? f_duration2 { get; set; }
+    public string? f_temperature2 { get; set; }
+    public bool? fcd1 { get; set; }
+    public bool? fcd2 { get; set; }
+    public bool? fcd3 { get; set; }
+    public string? fcd4 { get; set; }
+    public string? ventilation { get; set; }
+
     // Legacy Fields
     [JsonPropertyName("noOfQuantity")] public string? NoOfQuantity { get; set; }
     [JsonPropertyName("detail")] public string? Detail { get; set; }

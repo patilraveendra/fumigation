@@ -79,6 +79,9 @@ export interface CertificateData {
     placeCity?: string;
     placeCountry?: string;
     placePostcode?: string;
+    targetCommodity?: boolean;
+    targetContainer?: boolean;
+    targetPacking?: boolean;
     f_starttime?: string;
     f_endtime?: string;
     f_date_completed?: string;

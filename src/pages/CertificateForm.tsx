@@ -43,6 +43,9 @@ const initialData: CertificateData = {
     // Additional fields from legacy MB form (optional)
     tc_country: '',
     noOfQuantity: '0',
+    targetCommodity: false,
+    targetContainer: false,
+    targetPacking: false,
     detail: '',
     ct20: '',
     ct40: '',
@@ -247,11 +250,13 @@ function CertificateForm({ onLogout, onViewSaved, initialType, initialValues }: 
             return;
         }
 
+        const inputValue = event.target.type === 'checkbox' ? (event.target as HTMLInputElement).checked : event.target.value;
+
         if (name === 'f_duration' || name === 'durationFumigation') {
             setData((prev) => ({
                 ...prev,
-                f_duration: value,
-                durationFumigation: value,
+                f_duration: inputValue as string,
+                durationFumigation: inputValue as string,
             } as CertificateData));
             return;
         }
@@ -275,7 +280,7 @@ function CertificateForm({ onLogout, onViewSaved, initialType, initialValues }: 
 
         setData((prev) => ({
             ...prev,
-            [name]: value,
+            [name]: inputValue,
         } as CertificateData));
     };
 
@@ -288,7 +293,17 @@ function CertificateForm({ onLogout, onViewSaved, initialType, initialValues }: 
             // sync main data state with containers before actions
             setData(toSave);
             console.debug('Saving certificate payload:', toSave);
-            await generateCertificatePdf(toSave);
+            if (toSave.certificateType === 'AUS') {
+                try {
+                    sessionStorage.setItem('printData', JSON.stringify(toSave));
+                    localStorage.setItem('printData', JSON.stringify(toSave));
+                } catch {
+                    // ignore storage failures
+                }
+                window.open('/print', '_blank', 'noopener,noreferrer');
+            } else {
+                await generateCertificatePdf(toSave);
+            }
         } catch (error) {
             const message = error instanceof Error ? error.message : String(error);
             setSaveStatus(`PDF generation failed: ${message}`);
@@ -360,434 +375,517 @@ function CertificateForm({ onLogout, onViewSaved, initialType, initialValues }: 
                             </div>
                         </div>
                         <div className="card-body">
+                            {data.certificateType === 'AUS' ? (
+                                <>
+                                    <div className="row g-3">
+                                        <div className="col-md-6">
+                                            <label className="form-label">DPPQS Registration No</label>
+                                            <input
+                                                type="text"
+                                                name="providerId"
+                                                value={data.providerId}
+                                                onChange={handleInputChange}
+                                                className="form-control"
+                                            />
+                                        </div>
+
+                                        <div className="col-md-6">
+                                            <label className="form-label">Work Order</label>
+                                            <input
+                                                type="text"
+                                                name="workOrder"
+                                                value={data.workOrder ?? ''}
+                                                onChange={handleInputChange}
+                                                className="form-control"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="row g-3 mt-3">
+                                        <div className="col-12 text-center" style={{ fontWeight: 700, letterSpacing: '0.04em' }}>
+                                            TARGET OF FUMIGATION DETAIL
+                                        </div>
+                                    </div>
+
+                                    <div className="row g-3">
+                                        <div className="col-12">
+                                            <div className="d-flex flex-wrap gap-3 align-items-center">
+                                                <label className="form-check form-check-inline">
+                                                    <input className="form-check-input" type="checkbox" name="targetCommodity" checked={!!data.targetCommodity} onChange={handleInputChange} />
+                                                    <span className="form-check-label">Commodity</span>
+                                                </label>
+                                                <label className="form-check form-check-inline">
+                                                    <input className="form-check-input" type="checkbox" name="targetContainer" checked={!!data.targetContainer} onChange={handleInputChange} />
+                                                    <span className="form-check-label">Container</span>
+                                                </label>
+                                                <label className="form-check form-check-inline">
+                                                    <input className="form-check-input" type="checkbox" name="targetPacking" checked={!!data.targetPacking} onChange={handleInputChange} />
+                                                    <span className="form-check-label">Packing</span>
+                                                </label>
+                                                <div className="d-flex align-items-center gap-2">
+                                                    <label className="form-label mb-0">Other:</label>
+                                                    <input type="text" name="other" value={data.other} onChange={handleInputChange} className="form-control" style={{ maxWidth: 240 }} />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="row g-3">
+                                        <div className="col-md-6">
+                                            <label className="form-label">* Commodity</label>
+                                            <textarea name="commodityDescription" value={data.commodityDescription} onChange={handleInputChange} className="form-control" rows={4} />
+                                        </div>
+                                        <div className="col-md-6">
+                                            <div className="row g-3">
+                                                <div className="col-12">
+                                                    <label className="form-label">* Quantity declared</label>
+                                                    <input type="text" name="quantityDeclared" value={data.quantityDeclared} onChange={handleInputChange} className="form-control" />
+                                                </div>
+                                                <div className="col-12">
+                                                    <label className="form-label">* No Of Quantity</label>
+                                                    <input type="number" name="noOfQuantity" value={data.noOfQuantity} onChange={handleInputChange} className="form-control" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="row g-3">
+                                        <div className="col-md-6">
+                                            <label className="form-label">Consignment Link</label>
+                                            <input type="text" name="consignmentLink" value={data.consignmentLink} onChange={handleInputChange} className="form-control" />
+                                        </div>
+                                        <div className="col-md-6">
+                                            <label className="form-label">* Country of origin</label>
+                                            <input type="text" name="countryOfOrigin" value={data.countryOfOrigin} onChange={handleInputChange} className="form-control" />
+                                        </div>
+                                    </div>
+
+                                    <div className="row g-3">
+                                        <div className="col-md-6">
+                                            <label className="form-label">* Port of Loading</label>
+                                            <input type="text" name="portOfLoading" value={data.portOfLoading} onChange={handleInputChange} className="form-control" />
+                                        </div>
+                                        <div className="col-md-6">
+                                            <label className="form-label">* Country of Destination</label>
+                                            <input type="text" name="destinationCountry" value={data.destinationCountry} onChange={handleInputChange} className="form-control" />
+                                        </div>
+                                    </div>
+
+                                    <div className="row g-3">
+                                        <div className="col-md-6">
+                                            <label className="form-label">* Name of Exporter</label>
+                                            <input type="text" name="d_name" value={data.d_name} onChange={handleInputChange} className="form-control" />
+                                        </div>
+                                        <div className="col-md-6">
+                                            <label className="form-label">* Exporter Invoice No</label>
+                                            <input type="text" name="invoiceno" value={data.invoiceno} onChange={handleInputChange} className="form-control" />
+                                        </div>
+                                    </div>
+
+                                    <div className="row g-3">
+                                        <div className="col-md-6">
+                                            <label className="form-label">Name of Exporter</label>
+                                            <input type="text" name="exporterName" value={data.exporterName} onChange={handleInputChange} className="form-control" />
+                                        </div>
+                                        <div className="col-md-6">
+                                            <label className="form-label">Address of Exporter</label>
+                                            <textarea name="d_address" value={data.d_address} onChange={handleInputChange} className="form-control" rows={3} />
+                                        </div>
+                                    </div>
+
+                                    <div className="row g-3">
+                                        <div className="col-md-6">
+                                            <label className="form-label">Place Address</label>
+                                            <input type="text" name="placeAddress" value={data.placeAddress} onChange={handleInputChange} className="form-control" />
+                                        </div>
+                                        <div className="col-md-6">
+                                            <label className="form-label">Place City</label>
+                                            <input type="text" name="placeCity" value={data.placeCity} onChange={handleInputChange} className="form-control" />
+                                        </div>
+                                    </div>
+
+                                    <div className="row g-3">
+                                        <div className="col-md-6">
+                                            <label className="form-label">Place Country</label>
+                                            <input type="text" name="placeCountry" value={data.placeCountry} onChange={handleInputChange} className="form-control" />
+                                        </div>
+                                        <div className="col-md-6">
+                                            <label className="form-label">Place Postcode</label>
+                                            <input type="text" name="placePostcode" value={data.placePostcode} onChange={handleInputChange} className="form-control" />
+                                        </div>
+                                    </div>
+                                </>
+                            ) : null}
+                        </div>
+                        <div className="card-body">
                             <div className="row g-3">
-
-                                {/* Row 1 */}
-                                <div className="col-md-4">
-                                    <label className="form-label">Country</label>
-                                    <input
-                                        type="text"
-                                        name="tc_country"
-                                        value={data.tc_country}
-                                        onChange={handleInputChange}
-                                        className="form-control"
-                                    />
-                                </div>
-
-                                <div className="col-md-4">
-                                    <label className="form-label">No Of Quantity</label>
-                                    <input
-                                        type="number"
-                                        name="noOfQuantity"
-                                        value={data.noOfQuantity}
-                                        onChange={handleInputChange}
-                                        className="form-control"
-                                    />
-                                </div>
-
-                                <div className="col-md-4">
-                                    <label className="form-label">Work Order</label>
-                                    <button
-                                        type="button"
-                                        className="btn btn-outline-secondary w-100"
-                                        onClick={() => {
-                                            // toggle edit flow: prompt for work order
-                                            const wo = prompt('Enter Work Order or leave blank');
-                                            if (wo !== null) {
-                                                setData(prev => ({ ...prev, workOrder: wo } as CertificateData));
-                                            }
-                                        }}
-                                    >
-                                        Select / Edit
-                                    </button>
-                                </div>
-
-                                {/* Exporter Name (keeps its column) */}
-                                <div className="col-md-6">
-                                    <label className="form-label">Exporter Name</label>
-                                    <input
-                                        type="text"
-                                        name="exporterName"
-                                        value={data.exporterName}
-                                        onChange={handleInputChange}
-                                        className="form-control"
-                                    />
-                                </div>
-
-                                {/* Force two-column layout: left = Exporter (invoice + address), right = Consignee (name + address) */}
-                                <div className="col-12">
-                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-                                        <div>
-                                            <label className="form-label">Exporter Invoice No & Date</label>
-                                            <input
-                                                type="text"
-                                                name="invoiceno"
-                                                value={data.invoiceno}
-                                                onChange={handleInputChange}
-                                                className="form-control"
-                                            />
-
-                                            <label className="form-label mt-3">Exporter Address</label>
-                                            <textarea
-                                                name="d_address"
-                                                value={data.d_address}
-                                                onChange={handleInputChange}
-                                                className="form-control"
-                                                rows={3}
-                                            />
-                                        </div>
-
-                                        <div>
-                                            <label className="form-label">Consignee Name</label>
-                                            <input
-                                                type="text"
-                                                name="consigneeName"
-                                                value={data.consigneeName}
-                                                onChange={handleInputChange}
-                                                className="form-control"
-                                            />
-
-                                            <label className="form-label mt-3">Address of Consignee</label>
-                                            <textarea
-                                                name="c_address"
-                                                value={data.c_address}
-                                                onChange={handleInputChange}
-                                                className="form-control"
-                                                rows={3}
-                                            />
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* Row 4 */}
-                                <div className="col-md-6">
-                                    <label className="form-label">NOTIFY PARTY</label>
-                                    <textarea
-                                        name="notify"
-                                        value={data.notify}
-                                        onChange={handleInputChange}
-                                        className="form-control"
-                                        rows={3}
-                                    />
-                                </div>
-
-                                <div className="col-md-6">
-                                    <label className="form-label">
-                                        Type and Description of Cargo
-                                    </label>
-                                    <textarea
-                                        name="commodityDescription"
-                                        value={data.commodityDescription}
-                                        onChange={handleInputChange}
-                                        className="form-control"
-                                        rows={3}
-                                    />
-                                </div>
-
-                                {/* Row 5
-                                <div className="col-md-4">
-                                    <label className="form-label">Commodity Quantity</label>
-                                    <input
-                                        type="text"
-                                        name="commodityQuantity"
-                                        value={data.commodityQuantity}
-                                        onChange={handleInputChange}
-                                        className="form-control"
-                                    />
-                                </div>*/}
-
-                                <div className="col-md-4">
-                                    <label className="form-label">Packaging Material</label>
-                                    <input
-                                        type="text"
-                                        name="packagingMaterial"
-                                        value={data.packagingMaterial}
-                                        onChange={handleInputChange}
-                                        className="form-control"
-                                    />
-                                </div>
-
-                                <div className="col-md-4">
-                                    <label className="form-label">Shipping Mark / Brand</label>
-                                    <input
-                                        type="text"
-                                        name="shippingMark"
-                                        value={data.shippingMark}
-                                        onChange={handleInputChange}
-                                        className="form-control"
-                                    />
-                                </div>
-
-                                {/* Row 6 */}
-                                <div className="col-md-12">
-                                    <label className="form-label">Quantity Declared</label>
-                                    <textarea
-                                        name="quantityDeclared"
-                                        value={data.quantityDeclared}
-                                        onChange={handleInputChange}
-                                        className="form-control"
-                                        rows={3}
-                                    />
-                                </div>
-
-                                {/* Row 7 */}
-                                <div className="col-md-4">
-                                    <label className="form-label">20' Container Type</label>
-                                    <select
-                                        name="ct20"
-                                        value={data.ct20}
-                                        onChange={handleInputChange}
-                                        className="form-select"
-                                    >
-                                        <option value="">Select</option>
-                                        <option value="FCL">FCL</option>
-                                        <option value="LCL">LCL</option>
-                                    </select>
-                                </div>
-
-                                <div className="col-md-4">
-                                    <label className="form-label">40' Container Type</label>
-                                    <select
-                                        name="ct40"
-                                        value={data.ct40}
-                                        onChange={handleInputChange}
-                                        className="form-select"
-                                    >
-                                        <option value="">Select</option>
-                                        <option value="FCL">FCL</option>
-                                        <option value="LCL">LCL</option>
-                                        <option value="HC">HC</option>
-                                    </select>
-                                </div>
-
-                                <div className="col-md-4">
-                                    <label className="form-label">Container No. Place</label>
-                                    <select
-                                        name="cnoat"
-                                        value={data.cnoat}
-                                        onChange={handleInputChange}
-                                        className="form-select"
-                                    >
-                                        <option value=""></option>
-                                        <option value="In Additional Declaration">
-                                            In Additional Declaration
-                                        </option>
-                                        <option value="As Per Format">
-                                            As Per Format
-                                        </option>
-                                        <option value="In Additional Declaration - Attachment">
-                                            In Additional Declaration - Attachment
-                                        </option>
-                                        <option value="As Per Format - Attachment">
-                                            As Per Format - Attachment
-                                        </option>
-                                        <option value="As Per Format - Hide Numbers">
-                                            As Per Format - Hide Numbers
-                                        </option>
-                                        <option value="As per Bill of Lading">
-                                            As per Bill of Lading
-                                        </option>
-                                    </select>
-                                </div>
-
-                                {/* Containers */}
-                                <div className="col-md-12">
-                                    <div className="d-flex justify-content-between align-items-center mb-2">
-                                        <label className="form-label mb-0">
-                                            Container No / Seal No
-                                        </label>
-
-                                        <button
-                                            type="button"
-                                            className="btn btn-info btn-sm"
-                                            onClick={addContainer}
-                                        >
-                                            Add Container
-                                        </button>
-                                    </div>
-
-                                    {containers.map((c, idx) => (
-                                        <div
-                                            key={idx}
-                                            className="row g-2 mb-2 align-items-center"
-                                        >
-                                            <div className="col-md-5">
-                                                <input
-                                                    placeholder="Container No"
-                                                    value={c.cont || ''}
-                                                    onChange={(e) =>
-                                                        updateContainer(
-                                                            idx,
-                                                            'cont',
-                                                            e.target.value
-                                                        )
-                                                    }
-                                                    className="form-control"
-                                                />
-                                            </div>
-
-                                            <div className="col-md-5">
-                                                <input
-                                                    placeholder="Seal No"
-                                                    value={c.seal || ''}
-                                                    onChange={(e) =>
-                                                        updateContainer(
-                                                            idx,
-                                                            'seal',
-                                                            e.target.value
-                                                        )
-                                                    }
-                                                    className="form-control"
-                                                />
-                                            </div>
-
-                                            <div className="col-md-2">
-                                                <button
-                                                    type="button"
-                                                    className="btn btn-danger btn-sm w-100"
-                                                    onClick={() => removeContainer(idx)}
-                                                >
-                                                    Delete
-                                                </button>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-
-                                {/* AUS extra address fields */}
-                                {data.certificateType === 'AUS' && (
+                                {data.certificateType === 'AUS' ? null : (
                                     <>
                                         <div className="col-md-4">
-                                            <label className="form-label">Place Address</label>
-                                            <input type="text" name="d_address" value={data.d_address} onChange={handleInputChange} className="form-control" />
+                                            <label className="form-label">Country</label>
+                                            <input
+                                                type="text"
+                                                name="tc_country"
+                                                value={data.tc_country}
+                                                onChange={handleInputChange}
+                                                className="form-control"
+                                            />
                                         </div>
+
                                         <div className="col-md-4">
-                                            <label className="form-label">Place City</label>
-                                            <input type="text" name="placeCity" value={(data as any).placeCity} onChange={handleInputChange} className="form-control" />
+                                            <label className="form-label">No Of Quantity</label>
+                                            <input
+                                                type="number"
+                                                name="noOfQuantity"
+                                                value={data.noOfQuantity}
+                                                onChange={handleInputChange}
+                                                className="form-control"
+                                            />
                                         </div>
+
                                         <div className="col-md-4">
-                                            <label className="form-label">Place Postcode</label>
-                                            <input type="text" name="placePostcode" value={(data as any).placePostcode} onChange={handleInputChange} className="form-control" />
+                                            <label className="form-label">Work Order</label>
+                                            <button
+                                                type="button"
+                                                className="btn btn-outline-secondary w-100"
+                                                onClick={() => {
+                                                    const wo = prompt('Enter Work Order or leave blank');
+                                                    if (wo !== null) {
+                                                        setData(prev => ({ ...prev, workOrder: wo } as CertificateData));
+                                                    }
+                                                }}
+                                            >
+                                                Select / Edit
+                                            </button>
+                                        </div>
+
+                                        <div className="col-md-6">
+                                            <label className="form-label">Exporter Name</label>
+                                            <input
+                                                type="text"
+                                                name="exporterName"
+                                                value={data.exporterName}
+                                                onChange={handleInputChange}
+                                                className="form-control"
+                                            />
+                                        </div>
+
+                                        <div className="col-12">
+                                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                                                <div>
+                                                    <label className="form-label">Exporter Invoice No & Date</label>
+                                                    <input
+                                                        type="text"
+                                                        name="invoiceno"
+                                                        value={data.invoiceno}
+                                                        onChange={handleInputChange}
+                                                        className="form-control"
+                                                    />
+
+                                                    <label className="form-label mt-3">Exporter Address</label>
+                                                    <textarea
+                                                        name="d_address"
+                                                        value={data.d_address}
+                                                        onChange={handleInputChange}
+                                                        className="form-control"
+                                                        rows={3}
+                                                    />
+                                                </div>
+
+                                                <div>
+                                                    <label className="form-label">Consignee Name</label>
+                                                    <input
+                                                        type="text"
+                                                        name="consigneeName"
+                                                        value={data.consigneeName}
+                                                        onChange={handleInputChange}
+                                                        className="form-control"
+                                                    />
+
+                                                    <label className="form-label mt-3">Address of Consignee</label>
+                                                    <textarea
+                                                        name="c_address"
+                                                        value={data.c_address}
+                                                        onChange={handleInputChange}
+                                                        className="form-control"
+                                                        rows={3}
+                                                    />
+                                                </div>
+                                            </div>
                                         </div>
                                     </>
                                 )}
-
                             </div>
                         </div>
                     </div>
-                    <div className="card mb-3">
-                        <div className="card-header">Treatment Details</div>
-                        <div className="card-body">
-                            <div className="row g-3">
-                                <div className="col-md-4">
-                                    <label className="form-label">Name of Fumigation</label>
-                                    <select name="f_type" value={data.f_type} onChange={handleInputChange} className="form-select">
-                                        <option value=""></option>
-                                        {(isMb ? mbFumigantOptions : alpFumigantOptions).map((option, index) => (
-                                            <option key={`${option}-${index}`} value={option}>{option}</option>
-                                        ))}
-                                    </select>
-                                </div>
-                                <div className="col-md-4">
-                                    <label className="form-label">Place of Fumigation</label>
-                                    <input type="text" name="placeOfFumigation" value={data.placeOfFumigation} onChange={handleInputChange} className="form-control" />
-                                </div>
-                                <div className="col-md-4">
-                                    <label className="form-label">Dosage rate of Fumigation</label>
-                                    <div className="d-flex gap-2">
-                                        <input type="text" name="f_doserate" value={data.f_doserate} onChange={handleInputChange} className="form-control" />
-                                        <select name="f_dosetype" value={data.f_dosetype} onChange={handleInputChange} className="form-select" style={{ maxWidth: 160 }}>
-                                            <option value=""></option>
-                                            {(isMb ? mbDosageTypeOptions : alpDosageTypeOptions).map((option, index) => (
-                                                <option key={`${option.value}-${index}`} value={option.value}>{option.label}</option>
-                                            ))}
-                                        </select>
+                    {data.certificateType === 'AUS' ? (
+                        <div className="card mb-3">
+                            <div className="card-header">Treatment Details</div>
+                            <div className="card-body">
+                                <div className="row g-3">
+                                    <div className="col-md-6">
+                                        <label className="form-label">Date of Fumigation Commenced</label>
+                                        <input type="date" name="f_date" value={data.f_date || data.fumigationStarted} onChange={handleInputChange} className="form-control" />
                                     </div>
-                                </div>
-                            </div>
-                            <div className="row g-3 mt-2">
-                                <div className="col-md-4">
-                                    <label className="form-label">Duration of Fumigation</label>
-                                    {isMb ? (
-                                        <div className="d-flex gap-2">
-                                            <input type="text" name="f_duration" value={data.f_duration || data.durationFumigation} onChange={handleInputChange} className="form-control" />
-                                            <select name="f_hour" value={data.f_hour} onChange={handleInputChange} className="form-select" style={{ maxWidth: 120 }}>
+                                    <div className="col-md-6">
+                                        <label className="form-label">Time of Fumigation Commenced</label>
+                                        <input type="text" name="f_starttime" value={data.f_starttime} onChange={handleInputChange} className="form-control" placeholder="HH:MM AM/PM" />
+                                    </div>
+
+                                    <div className="col-md-6">
+                                        <label className="form-label">Date of Fumigation Completed</label>
+                                        <input type="date" name="f_date_completed" value={data.f_date_completed} onChange={handleInputChange} className="form-control" />
+                                    </div>
+                                    <div className="col-md-6">
+                                        <label className="form-label">Time of Fumigation Completed</label>
+                                        <input type="text" name="f_endtime" value={data.f_endtime} onChange={handleInputChange} className="form-control" placeholder="HH:MM AM/PM" />
+                                    </div>
+
+                                    <div className="col-md-6">
+                                        <label className="form-label">* DAWR prescribed dose rate (g/m<sup>3</sup>)</label>
+                                        <div className="d-flex gap-2 align-items-center">
+                                            <input type="text" name="f_doserate" value={data.f_doserate} onChange={handleInputChange} className="form-control" />
+                                            <select name="f_dosetype" value={data.f_dosetype} onChange={handleInputChange} className="form-select" style={{ maxWidth: 160 }}>
                                                 <option value=""></option>
-                                                {mbDurationUnitOptions.map((option) => (
-                                                    <option key={option.value} value={option.value}>{option.label}</option>
+                                                {alpDosageTypeOptions.map((option, index) => (
+                                                    <option key={`${option.value}-${index}`} value={option.value}>{option.label}</option>
                                                 ))}
                                             </select>
                                         </div>
-                                    ) : (
+                                    </div>
+                                    <div className="col-md-6">
+                                        <label className="form-label">* Exposure period (hrs)</label>
                                         <div className="d-flex gap-2 align-items-center">
-                                            <input type="text" name="f_duration_days" value={data.f_duration_days} onChange={handleInputChange} className="form-control" />
-                                            <span>Days</span>
-                                            <input type="text" name="f_duration_hours" value={data.f_duration_hours} onChange={handleInputChange} className="form-control" />
-                                            <span>Hours</span>
+                                            <input type="text" name="f_duration" value={data.f_duration} onChange={handleInputChange} className="form-control" />
+                                            <span>HOURS</span>
                                         </div>
-                                    )}
-                                </div>
-                                <div className="col-md-4">
-                                    {isMb ? (
-                                        <>
-                                            <label className="form-label">Minimum air temperature</label>
-                                            <div className="d-flex gap-2">
-                                                <input type="text" name="f_temperature" value={data.f_temperature || data.temperature} onChange={handleInputChange} className="form-control" />
-                                                <select name="f_ttype" value={data.f_ttype} onChange={handleInputChange} className="form-select" style={{ maxWidth: 160 }}>
-                                                    <option value=""></option>
-                                                    <option value="DEG. CELSIUS">DEG. CELSIUS</option>
-                                                    <option value="DEG. CELSIUS">DEG. CELSIUS</option>
-                                                </select>
+                                    </div>
+
+                                    <div className="col-md-6">
+                                        <label className="form-label">* Forecast minimum temp (C)</label>
+                                        <div className="d-flex gap-2 align-items-center">
+                                            <input type="text" name="f_temperature" value={data.f_temperature} onChange={handleInputChange} className="form-control" />
+                                            <span>DEG. CELSIUS</span>
+                                        </div>
+                                    </div>
+                                    <div className="col-md-6">
+                                        <label className="form-label">* Applied Dosage rate (g/m<sup>3</sup>)</label>
+                                        <div className="d-flex gap-2 align-items-center">
+                                            <input type="text" name="f_doserate2" value={data.f_doserate2} onChange={handleInputChange} className="form-control" />
+                                            <select name="f_dosetype2" value={data.f_dosetype2} onChange={handleInputChange} className="form-select" style={{ maxWidth: 160 }}>
+                                                <option value=""></option>
+                                                {alpDosageTypeOptions.map((option, index) => (
+                                                    <option key={`${option.value}-${index}`} value={option.value}>{option.label}</option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div className="col-md-6">
+                                        <label className="form-label">Exposure period (hrs)</label>
+                                        <div className="d-flex gap-2 align-items-center">
+                                            <input type="text" name="f_duration2" value={data.f_duration2} onChange={handleInputChange} className="form-control" />
+                                            <span>HOURS</span>
+                                        </div>
+                                    </div>
+                                    <div className="col-md-6">
+                                        <label className="form-label">Forecast minimum temp (C)</label>
+                                        <div className="d-flex gap-2 align-items-center">
+                                            <input type="text" name="f_temperature2" value={data.f_temperature2} onChange={handleInputChange} className="form-control" />
+                                            <span>DEG. CELSIUS</span>
+                                        </div>
+                                    </div>
+
+                                    <div className="col-md-12">
+                                        <label className="form-label">* Enclosure Type</label>
+                                        <div className="d-flex flex-wrap gap-3 align-items-center">
+                                            <div className="form-check">
+                                                <input className="form-check-input" type="checkbox" name="fcd1" checked={!!data.fcd1} onChange={handleInputChange} id="fcd1" />
+                                                <label className="form-check-label" htmlFor="fcd1">Sheeted enclosure</label>
                                             </div>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <label className="form-label">Average Ambient Humidity</label>
-                                            <div className="d-flex gap-2 align-items-center">
-                                                <input type="text" name="humidity" value={data.humidity} onChange={handleInputChange} className="form-control" style={{ maxWidth: 120 }} />
-                                                <span>%</span>
-                                                <input type="text" name="temperature" value={data.temperature} onChange={handleInputChange} className="form-control" style={{ maxWidth: 100 }} />
-                                                <span>°C</span>
+                                            <div className="form-check">
+                                                <input className="form-check-input" type="checkbox" name="fcd2" checked={!!data.fcd2} onChange={handleInputChange} id="fcd2" />
+                                                <label className="form-check-label" htmlFor="fcd2">Fumigation chamber</label>
                                             </div>
-                                        </>
-                                    )}
-                                </div>
-                                <div className="col-md-4">
-                                    <label className="form-label">Date of Fumigation</label>
-                                    <input type="date" name="f_date" value={data.f_date || data.fumigationStarted} onChange={handleInputChange} className="form-control" />
-                                </div>
-                            </div>
-                            <div className="row g-3 mt-3">
-                                <div className="col-md-4">
-                                    <label className="form-label">Fumigation Performed Under gastight sheets</label>
-                                    <select name="f_performed" value={data.f_performed} onChange={handleInputChange} className="form-select">
-                                        <option value=""></option>
-                                        <option value="Yes">Yes</option>
-                                        <option value="No">No</option>
-                                    </select>
-                                </div>
-                                <div className="col-md-4">
-                                    <label className="form-label">Container has 200mm free air space at top of container</label>
-                                    <select name="f_airspace" value={data.f_airspace} onChange={handleInputChange} className="form-select">
-                                        <option value=""></option>
-                                        <option value="N/A">N/A</option>
-                                        <option value="Yes">Yes</option>
-                                        <option value="No">No</option>
-                                    </select>
-                                </div>
-                                {isMb ? (
-                                    <div className="col-md-4">
-                                        <label className="form-label">Fumigation Carried Out In</label>
-                                        <select name="fcoi" value={data.fcoi} onChange={handleInputChange} className="form-select">
-                                            <option value=""></option>
-                                            <option value="NSPM 12 AND ISPM 15 REGULATION OF IPPC">NSPM 12 AND ISPM 15 REGULATION OF IPPC</option>
-                                            <option value="NSPM 12">NSPM 12</option>
+                                            <div className="form-check">
+                                                <input className="form-check-input" type="checkbox" name="fcd3" checked={!!data.fcd3} onChange={handleInputChange} id="fcd3" />
+                                                <label className="form-check-label" htmlFor="fcd3">Un-sheeted container</label>
+                                            </div>
+                                            <div className="d-flex align-items-center gap-2">
+                                                <label className="form-label mb-0">Other:</label>
+                                                <input type="text" name="fcd4" value={data.fcd4} onChange={handleInputChange} className="form-control" style={{ maxWidth: 240 }} />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="col-md-12">
+                                        <div className="d-flex justify-content-between align-items-center mb-2">
+                                            <label className="form-label mb-0">Consignment Link / Container No</label>
+                                            <button type="button" className="btn btn-info btn-sm" onClick={addContainer}>Click To Add Container Number</button>
+                                        </div>
+                                        {containers.length === 0 ? null : containers.map((c, idx) => (
+                                            <div key={idx} className="row g-2 mb-2 align-items-center">
+                                                <div className="col-md-5">
+                                                    <input placeholder="Container No" value={c.cont || ''} onChange={(e) => updateContainer(idx, 'cont', e.target.value)} className="form-control" />
+                                                </div>
+                                                <div className="col-md-5">
+                                                    <input placeholder="Seal No" value={c.seal || ''} onChange={(e) => updateContainer(idx, 'seal', e.target.value)} className="form-control" />
+                                                </div>
+                                                <div className="col-md-2">
+                                                    <button type="button" className="btn btn-danger btn-sm w-100" onClick={() => removeContainer(idx)}>Delete</button>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+
+                                    <div className="col-md-12">
+                                        <label className="form-label">* Ventilation Final TLV reading(ppm)</label>
+                                        <input type="text" name="ventilation" value={data.ventilation} onChange={handleInputChange} className="form-control" />
+                                        <small className="text-muted">(not required for Stack or Permanent Chamber fumigation)</small>
+                                    </div>
+
+                                    <div className="col-md-12">
+                                        <label className="form-label">* Container No. Place</label>
+                                        <select name="cnoat" value={data.cnoat} onChange={handleInputChange} className="form-select">
+                                            <option value="">Select</option>
+                                            <option value="In Additional Declaration">In Additional Declaration</option>
+                                            <option value="As Per Format">As Per Format</option>
+                                            <option value="In Additional Declaration - Attachment">In Additional Declaration - Attachment</option>
+                                            <option value="As Per Format - Attachment">As Per Format - Attachment</option>
+                                            <option value="As Per Format - Hide Numbers">As Per Format - Hide Numbers</option>
+                                            <option value="As per Bill of Lading">As per Bill of Lading</option>
                                         </select>
                                     </div>
-                                ) : null}
+
+                                    <div className="col-md-12">
+                                        <label className="form-label">* Additional Declaration</label>
+                                        <textarea name="declaration" value={data.declaration} onChange={handleInputChange} className="form-control" rows={4} />
+                                    </div>
+
+                                    <div className="col-md-12">
+                                        <label className="form-label">Office Remark</label>
+                                        <textarea name="oremark" value={data.oremark} onChange={handleInputChange} className="form-control" rows={3} />
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    ) : (
+                        <div className="card mb-3">
+                            <div className="card-header">Treatment Details</div>
+                            <div className="card-body">
+                                <div className="row g-3">
+                                    <div className="col-md-4">
+                                        <label className="form-label">Name of Fumigation</label>
+                                        <select name="f_type" value={data.f_type} onChange={handleInputChange} className="form-select">
+                                            <option value=""></option>
+                                            {(isMb ? mbFumigantOptions : alpFumigantOptions).map((option, index) => (
+                                                <option key={`${option}-${index}`} value={option}>{option}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    <div className="col-md-4">
+                                        <label className="form-label">Place of Fumigation</label>
+                                        <input type="text" name="placeOfFumigation" value={data.placeOfFumigation} onChange={handleInputChange} className="form-control" />
+                                    </div>
+                                    <div className="col-md-4">
+                                        <label className="form-label">Dosage rate of Fumigation</label>
+                                        <div className="d-flex gap-2">
+                                            <input type="text" name="f_doserate" value={data.f_doserate} onChange={handleInputChange} className="form-control" />
+                                            <select name="f_dosetype" value={data.f_dosetype} onChange={handleInputChange} className="form-select" style={{ maxWidth: 160 }}>
+                                                <option value=""></option>
+                                                {(isMb ? mbDosageTypeOptions : alpDosageTypeOptions).map((option, index) => (
+                                                    <option key={`${option.value}-${index}`} value={option.value}>{option.label}</option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="row g-3 mt-2">
+                                    <div className="col-md-4">
+                                        <label className="form-label">Duration of Fumigation</label>
+                                        {isMb ? (
+                                            <div className="d-flex gap-2">
+                                                <input type="text" name="f_duration" value={data.f_duration || data.durationFumigation} onChange={handleInputChange} className="form-control" />
+                                                <select name="f_hour" value={data.f_hour} onChange={handleInputChange} className="form-select" style={{ maxWidth: 120 }}>
+                                                    <option value=""></option>
+                                                    {mbDurationUnitOptions.map((option) => (
+                                                        <option key={option.value} value={option.value}>{option.label}</option>
+                                                    ))}
+                                                </select>
+                                            </div>
+                                        ) : (
+                                            <div className="d-flex gap-2 align-items-center">
+                                                <input type="text" name="f_duration_days" value={data.f_duration_days} onChange={handleInputChange} className="form-control" />
+                                                <span>Days</span>
+                                                <input type="text" name="f_duration_hours" value={data.f_duration_hours} onChange={handleInputChange} className="form-control" />
+                                                <span>Hours</span>
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className="col-md-4">
+                                        {isMb ? (
+                                            <>
+                                                <label className="form-label">Minimum air temperature</label>
+                                                <div className="d-flex gap-2">
+                                                    <input type="text" name="f_temperature" value={data.f_temperature || data.temperature} onChange={handleInputChange} className="form-control" />
+                                                    <select name="f_ttype" value={data.f_ttype} onChange={handleInputChange} className="form-select" style={{ maxWidth: 160 }}>
+                                                        <option value=""></option>
+                                                        <option value="DEG. CELSIUS">DEG. CELSIUS</option>
+                                                        <option value="DEG. CELSIUS">DEG. CELSIUS</option>
+                                                    </select>
+                                                </div>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <label className="form-label">Average Ambient Humidity</label>
+                                                <div className="d-flex gap-2 align-items-center">
+                                                    <input type="text" name="humidity" value={data.humidity} onChange={handleInputChange} className="form-control" style={{ maxWidth: 120 }} />
+                                                    <span>%</span>
+                                                    <input type="text" name="temperature" value={data.temperature} onChange={handleInputChange} className="form-control" style={{ maxWidth: 100 }} />
+                                                    <span>°C</span>
+                                                </div>
+                                            </>
+                                        )}
+                                    </div>
+                                    <div className="col-md-4">
+                                        <label className="form-label">Date of Fumigation</label>
+                                        <input type="date" name="f_date" value={data.f_date || data.fumigationStarted} onChange={handleInputChange} className="form-control" />
+                                    </div>
+                                </div>
+                                <div className="row g-3 mt-3">
+                                    <>
+                                        <div className="col-md-4">
+                                            <label className="form-label">Fumigation Performed Under gastight sheets</label>
+                                            <select name="f_performed" value={data.f_performed} onChange={handleInputChange} className="form-select">
+                                                <option value=""></option>
+                                                <option value="Yes">Yes</option>
+                                                <option value="No">No</option>
+                                            </select>
+                                        </div>
+                                        <div className="col-md-4">
+                                            <label className="form-label">Container has 200mm free air space at top of container</label>
+                                            <select name="f_airspace" value={data.f_airspace} onChange={handleInputChange} className="form-select">
+                                                <option value=""></option>
+                                                <option value="N/A">N/A</option>
+                                                <option value="Yes">Yes</option>
+                                                <option value="No">No</option>
+                                            </select>
+                                        </div>
+                                    </>
+                                    {isMb ? (
+                                        <div className="col-md-4">
+                                            <label className="form-label">Fumigation Carried Out In</label>
+                                            <select name="fcoi" value={data.fcoi} onChange={handleInputChange} className="form-select">
+                                                <option value=""></option>
+                                                <option value="NSPM 12 AND ISPM 15 REGULATION OF IPPC">NSPM 12 AND ISPM 15 REGULATION OF IPPC</option>
+                                                <option value="NSPM 12">NSPM 12</option>
+                                            </select>
+                                        </div>
+                                    ) : null}
+                                </div>
+                            </div>
+                        </div>
+                    )}
                     <div className="card mb-3">
                         <div className="card-header">Operator Details</div>
                         <div className="card-body">
