@@ -613,6 +613,39 @@ function CertificateForm({ onLogout, onViewSaved, initialType, initialValues }: 
                                                 </div>
                                             </div>
                                         </div>
+
+                                        <div className="col-md-6">
+                                            <label className="form-label">Description of Packaging Materials</label>
+                                            <input
+                                                type="text"
+                                                name="detail"
+                                                value={data.detail}
+                                                onChange={handleInputChange}
+                                                className="form-control"
+                                            />
+                                        </div>
+
+                                        <div className="col-md-6">
+                                            <label className="form-label">Shipping Marks</label>
+                                            <input
+                                                type="text"
+                                                name="l_ship"
+                                                value={data.l_ship}
+                                                onChange={handleInputChange}
+                                                className="form-control"
+                                            />
+                                        </div>
+
+                                        <div className="col-md-12">
+                                            <label className="form-label">Notify Party</label>
+                                            <textarea
+                                                name="notify"
+                                                value={data.notify}
+                                                onChange={handleInputChange}
+                                                className="form-control"
+                                                rows={2}
+                                            />
+                                        </div>
                                     </>
                                 )}
                             </div>
@@ -719,42 +752,9 @@ function CertificateForm({ onLogout, onViewSaved, initialType, initialValues }: 
                                     </div>
 
                                     <div className="col-md-12">
-                                        <div className="d-flex justify-content-between align-items-center mb-2">
-                                            <label className="form-label mb-0">Consignment Link / Container No</label>
-                                            <button type="button" className="btn btn-info btn-sm" onClick={addContainer}>Click To Add Container Number</button>
-                                        </div>
-                                        {containers.length === 0 ? null : containers.map((c, idx) => (
-                                            <div key={idx} className="row g-2 mb-2 align-items-center">
-                                                <div className="col-md-5">
-                                                    <input placeholder="Container No" value={c.cont || ''} onChange={(e) => updateContainer(idx, 'cont', e.target.value)} className="form-control" />
-                                                </div>
-                                                <div className="col-md-5">
-                                                    <input placeholder="Seal No" value={c.seal || ''} onChange={(e) => updateContainer(idx, 'seal', e.target.value)} className="form-control" />
-                                                </div>
-                                                <div className="col-md-2">
-                                                    <button type="button" className="btn btn-danger btn-sm w-100" onClick={() => removeContainer(idx)}>Delete</button>
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-
-                                    <div className="col-md-12">
                                         <label className="form-label">* Ventilation Final TLV reading(ppm)</label>
                                         <input type="text" name="ventilation" value={data.ventilation} onChange={handleInputChange} className="form-control" />
                                         <small className="text-muted">(not required for Stack or Permanent Chamber fumigation)</small>
-                                    </div>
-
-                                    <div className="col-md-12">
-                                        <label className="form-label">* Container No. Place</label>
-                                        <select name="cnoat" value={data.cnoat} onChange={handleInputChange} className="form-select">
-                                            <option value="">Select</option>
-                                            <option value="In Additional Declaration">In Additional Declaration</option>
-                                            <option value="As Per Format">As Per Format</option>
-                                            <option value="In Additional Declaration - Attachment">In Additional Declaration - Attachment</option>
-                                            <option value="As Per Format - Attachment">As Per Format - Attachment</option>
-                                            <option value="As Per Format - Hide Numbers">As Per Format - Hide Numbers</option>
-                                            <option value="As per Bill of Lading">As per Bill of Lading</option>
-                                        </select>
                                     </div>
 
                                     <div className="col-md-12">
@@ -851,6 +851,10 @@ function CertificateForm({ onLogout, onViewSaved, initialType, initialValues }: 
                                         <label className="form-label">Date of Fumigation</label>
                                         <input type="date" name="f_date" value={data.f_date || data.fumigationStarted} onChange={handleInputChange} className="form-control" />
                                     </div>
+                                    <div className="col-md-4">
+                                        <label className="form-label">Final TLV Reading</label>
+                                        <input type="text" name="finalTlvReading" value={data.finalTlvReading} onChange={handleInputChange} className="form-control" />
+                                    </div>
                                 </div>
                                 <div className="row g-3 mt-3">
                                     <>
@@ -882,6 +886,66 @@ function CertificateForm({ onLogout, onViewSaved, initialType, initialValues }: 
                                             </select>
                                         </div>
                                     ) : null}
+                                    <div className="col-md-4">
+                                        <label className="form-label">20' Container Type</label>
+                                        <select
+                                            name="ct20"
+                                            value={data.ct20}
+                                            onChange={handleInputChange}
+                                            className="form-select"
+                                        >
+                                            <option value="">Select</option>
+                                            <option value="FCL">FCL</option>
+                                            <option value="LCL">LCL</option>
+                                        </select>
+                                    </div>
+
+                                    <div className="col-md-4">
+                                        <label className="form-label">40' Container Type</label>
+                                        <select
+                                            name="ct40"
+                                            value={data.ct40}
+                                            onChange={handleInputChange}
+                                            className="form-select"
+                                        >
+                                            <option value="">Select</option>
+                                            <option value="FCL">FCL</option>
+                                            <option value="LCL">LCL</option>
+                                        </select>
+                                    </div>
+
+                                    <div className="col-md-12">
+                                        <div className="d-flex justify-content-between align-items-center mb-2">
+                                            <label className="form-label mb-0">Consignment Link / Container No</label>
+                                            <button type="button" className="btn btn-info btn-sm" onClick={addContainer}>Click To Add Container Number</button>
+                                        </div>
+                                        {containers.length === 0 ? null : containers.map((c, idx) => (
+                                            <div key={idx} className="row g-2 mb-2 align-items-center">
+                                                <div className="col-md-5">
+                                                    <input placeholder="Container No" value={c.cont || ''} onChange={(e) => updateContainer(idx, 'cont', e.target.value)} className="form-control" />
+                                                </div>
+                                                <div className="col-md-5">
+                                                    <input placeholder="Seal No" value={c.seal || ''} onChange={(e) => updateContainer(idx, 'seal', e.target.value)} className="form-control" />
+                                                </div>
+                                                <div className="col-md-2">
+                                                    <button type="button" className="btn btn-danger btn-sm w-100" onClick={() => removeContainer(idx)}>Delete</button>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+
+                                    <div className="col-md-12">
+                                        <label className="form-label">* Container No. Place</label>
+                                        <select name="cnoat" value={data.cnoat} onChange={handleInputChange} className="form-select">
+                                            <option value="">Select</option>
+                                            <option value="In Additional Declaration">In Additional Declaration</option>
+                                            <option value="As Per Format">As Per Format</option>
+                                            <option value="In Additional Declaration - Attachment">In Additional Declaration - Attachment</option>
+                                            <option value="As Per Format - Attachment">As Per Format - Attachment</option>
+                                            <option value="As Per Format - Hide Numbers">As Per Format - Hide Numbers</option>
+                                            <option value="As per Bill of Lading">As per Bill of Lading</option>
+                                        </select>
+                                    </div>
                                 </div>
                             </div>
                         </div>
