@@ -43,6 +43,11 @@ const Layout: React.FC<{ children: React.ReactNode; onLogout?: () => void }> = (
                         </li>
                     </ul>
                 </li>
+                <li className="nav-item">
+                    <Link to="/report" className="nav-link text-light">
+                        <i className="bi bi-file-earmark-spreadsheet me-2" /> Reports
+                    </Link>
+                </li>
             </ul>
             <hr />
             <div className="mt-auto small text-light-50">&copy; {new Date().getFullYear()} Pest & Solutions</div>

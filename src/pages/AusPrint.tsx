@@ -24,7 +24,7 @@ function joinValues(items: Array<string | undefined | null>, separator = ', ') {
 }
 
 const CheckBox: React.FC<{ checked?: boolean }> = ({ checked }) => (
-    <span className={`aus-checkbox${checked ? ' aus-checkbox-checked' : ''}`}>{checked ? 'X' : ''}</span>
+    <span className={`aus-checkbox${checked ? ' aus-checkbox-checked' : ''}`}>{checked ? '✓' : ''}</span>
 );
 
 const AusPrint: React.FC<AusPrintProps> = ({ data }) => {
@@ -153,14 +153,14 @@ const AusPrint: React.FC<AusPrintProps> = ({ data }) => {
                     }
                     .aus-checkbox {
                         display: inline-block;
-                        width: 11px;
-                        height: 11px;
+                        width: 12px;
+                        height: 12px;
                         border: 1px solid #222;
                         margin: 0 5px 0 0;
-                        font-size: 9px;
-                        line-height: 10px;
+                        font-size: 11px;
+                        line-height: 12px;
                         text-align: center;
-                        vertical-align: -1px;
+                        vertical-align: middle;
                         font-weight: 700;
                     }
                     .aus-target-table td,

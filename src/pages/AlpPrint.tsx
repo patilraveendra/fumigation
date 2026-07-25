@@ -58,12 +58,12 @@ const AlpPrint: React.FC<AlpPrintProps> = ({ data }) => {
     else if (ct20) selectedType = `20' ${ct20}`;
 
     let containertype = selectedType ? `${containercount} X ${selectedType}` : '';
+    const containerDeclaration = isAdditionalFlag(data.cnoat) && containerRows.length > 0
+        ? `ABOVE MENTIONED CARGO IS SAID TO STUFFED IN CONTAINER NO.: ${containerRows.join(', ')}${containertype ? ` ${containertype}` : ''}`
+        : undefined;
     const declarationLines = [
         declaration,
-        isAdditionalFlag(data.cnoat) && containerRows.length > 0
-            ? `ABOVE MENTIONED CARGO IS SAID TO STUFFED IN CONTAINER NO.: ${containerRows.join(', ')}`
-            : undefined,
-        isAdditionalFlag(data.cnoat) && containertype ? ` ${containertype}` : undefined
+        containerDeclaration,
     ].filter(Boolean) as string[];
     const humidityVal = value(data.humidity);
     const tempVal = value(data.temperature, data.f_temperature);

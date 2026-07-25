@@ -6,6 +6,7 @@ import CertificateForm from "./pages/CertificateForm";
 import SavedCertificates from "./pages/SavedCertificates";
 import MbrCertificates from "./pages/MbrCertificates";
 import AlpCertificates from "./pages/AlpCertificates";
+import CertificateReport from "./pages/CertificateReport";
 import NotFound from "./pages/NotFound";
 import Layout from "./components/Layout";
 import CreateMbr from "./pages/CreateMbr";
@@ -61,6 +62,14 @@ function AppRoutes({ isAuthenticated, setIsAuthenticated }: { isAuthenticated: b
                         element={
                             <Layout onLogout={() => { setIsAuthenticated(false); navigate('/'); }}>
                                 <AusCertificates onLogout={() => { setIsAuthenticated(false); navigate('/'); }} onBack={() => { navigate('/form'); }} />
+                            </Layout>
+                        }
+                    />
+                    <Route
+                        path="/report"
+                        element={
+                            <Layout onLogout={() => { setIsAuthenticated(false); navigate('/'); }}>
+                                <CertificateReport onLogout={() => { setIsAuthenticated(false); navigate('/'); }} onBack={() => { navigate('/dashboard'); }} />
                             </Layout>
                         }
                     />

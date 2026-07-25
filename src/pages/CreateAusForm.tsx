@@ -1,6 +1,6 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import CertificateForm from './CertificateForm';
+import AUSCertificateForm from './AUSCertificateForm';
 
 const CreateAusForm: React.FC = () => {
     const location = useLocation();
@@ -14,7 +14,7 @@ const CreateAusForm: React.FC = () => {
     }, [initialValues, navigate]);
 
     if (!initialValues) return null;
-    return <CertificateForm initialType="AUS" initialValues={initialValues} />;
+    return <AUSCertificateForm initialType="AUS" initialValues={initialValues} />;
 };
 
 export default CreateAusForm;
