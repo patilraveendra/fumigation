@@ -18,6 +18,28 @@ interface ReportRow {
     rawData: Partial<CertificateData>;
 }
 
+/**
+ * Renders a comprehensive certificate report dashboard with filtering and export capabilities.
+ * 
+ * @component
+ * @param {Object} props - Component props
+ * @param {() => void} [props.onLogout] - Optional callback function triggered when user clicks logout button
+ * @param {() => void} [props.onBack] - Optional callback function triggered when user clicks back button; defaults to navigating to '/dashboard'
+ * @returns {JSX.Element} A certificate report interface with filters, download options, and data table
+ * 
+ * @description
+ * This component manages certificate data reporting with the following features:
+ * - Loads all certificates from a single API endpoint (`fetchCertificates()`) on component mount
+ * - Filters certificates by type (MB, ALP, AUS) and optional date range
+ * - Generates in-memory reports by transforming and filtering the loaded certificate data
+ * - Exports filtered data to CSV and JSON formats
+ * - Displays results in a responsive table with combined container and seal numbers
+ * 
+ * @note
+ * All data comes from a single `fetchCertificates()` API call. The component performs client-side filtering
+ * and transformation on the complete dataset rather than making multiple API requests. For large datasets,
+ * consider implementing server-side filtering and pagination.
+ */
 function CertificateReport({ onLogout, onBack }: { onLogout?: () => void; onBack?: () => void }) {
     const navigate = useNavigate();
     const [records, setRecords] = useState<CertificateRecord[]>([]);
