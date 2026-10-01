@@ -260,23 +260,12 @@ function CertificateForm({ onLogout, onViewSaved, initialType, initialValues }: 
 
     const handleGeneratePdf = async () => {
         setSaveStatus(null);
-        let toSave: CertificateData;
-        try {
-            // Ensure latest container state is used when generating/saving
-            toSave = { ...data, containers } as CertificateData;
-            // sync main data state with containers before actions
-            setData(toSave);
-            console.debug('Saving certificate payload:', toSave);
-            await generateCertificatePdf(toSave);
-        } catch (error) {
-            const message = error instanceof Error ? error.message : String(error);
-            setSaveStatus(`PDF generation failed: ${message}`);
-            console.error('PDF generation error:', error);
-            return;
-        }
+
+        const toSave = { ...data, containers } as CertificateData;
+        setData(toSave);
+
         setIsSaving(true);
         try {
-            // use the synced `toSave` payload to ensure latest fields (like cnoat) are persisted
             await saveCertificate(toSave);
             setSaveStatus('Certificate saved successfully.');
         } catch (error) {
@@ -780,7 +769,7 @@ function CertificateForm({ onLogout, onViewSaved, initialType, initialValues }: 
                     </div>
                     <div className="d-flex gap-2 justify-content-end mb-4">
                         <button type="button" className="btn btn-success" onClick={handleGeneratePdf} disabled={isSaving}>
-                            {isSaving ? 'Saving…' : 'Generate & Save'}
+                            {isSaving ? 'Saving…' : 'Save'}
                         </button>
                         <button type="button" className="btn btn-outline-primary" onClick={() => {
                             try {

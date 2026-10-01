@@ -1,0 +1,7 @@
+
+body{font-family:Arial,sans-serif;margin:0}
+.sidebar{width:280px;position:fixed;left:0;top:0;bottom:0;overflow:auto;background:#f4f4f4;padding:15px}
+.content{margin-left:300px;padding:20px}
+a{text-decoration:none}
+.time{color:#777;font-size:12px}
+pre{white-space:pre-wrap;font-family:inherit}

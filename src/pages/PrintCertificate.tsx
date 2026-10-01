@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { CertificateData } from '../types/certificate';
 import AlpPrint from './AlpPrint';
 import MbPrint from './MbPrint';
+import AusPrint from './AusPrint';
 
 const PrintCertificate: React.FC = () => {
     const [data, setData] = useState<CertificateData | null>(null);
@@ -31,6 +32,9 @@ const PrintCertificate: React.FC = () => {
 
     if (data.certificateType === 'ALP') {
         return <AlpPrint data={data} />;
+    }
+    if (data.certificateType === 'AUS') {
+        return <AusPrint data={data} />;
     }
 
     return <MbPrint data={data} />;

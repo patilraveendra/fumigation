@@ -160,6 +160,26 @@ app.MapGet("/api/alp/certificates", async (IDatabaseService db) =>
     return Results.Ok(records);
 });
 
+// SQL-backed AUS Certificate endpoints
+app.MapPost("/api/aus/certificates", async (AusCertificate record, IDatabaseService db) =>
+{
+    try
+    {
+        var saved = await db.SaveAusCertificateAsync(record);
+        return Results.Created($"/api/aus/certificates/{saved.CertificateId}", saved);
+    }
+    catch (Exception ex)
+    {
+        return Results.BadRequest(new { error = ex.Message, type = ex.GetType().Name });
+    }
+});
+
+app.MapGet("/api/aus/certificates", async (IDatabaseService db) =>
+{
+    var records = await db.GetAllAusCertificatesAsync();
+    return Results.Ok(records);
+});
+
 try
 {
     app.Run();

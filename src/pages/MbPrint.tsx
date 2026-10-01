@@ -77,12 +77,12 @@ const MbPrint: React.FC<MbPrintProps> = ({ data }) => {
     let containertype = selectedType ? `${containercount} X ${selectedType}` : '';
 
 
+    const containerDeclaration = isAdditionalFlag(data.cnoat) && containerRows.length > 0
+        ? `ABOVE MENTIONED CARGO IS SAID TO STUFFED IN CONTAINER NO.: ${containerRows.join(', ')}${containertype ? ` ${containertype}` : ''}`
+        : undefined;
     const declarationLines = [
         declaration,
-        isAdditionalFlag(data.cnoat) && containerRows.length > 0
-            ? `ABOVE MENTIONED CARGO IS SAID TO STUFFED IN CONTAINER NO.: ${containerRows.join(', ')}`
-            : undefined,
-        isAdditionalFlag(data.cnoat) && containertype ? ` ${containertype}` : undefined
+        containerDeclaration,
     ].filter(Boolean) as string[];
 
     let standardDeclarationText = '';
