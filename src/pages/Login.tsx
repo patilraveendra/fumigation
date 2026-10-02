@@ -1,33 +1,38 @@
 import { useState, type FormEvent } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { credentialsMatch, loadLoginConfig } from '../auth/loginConfig';
 import './Login.compact.css';
 
 interface LoginProps {
     onLogin: () => void;
 }
 
-const validUsername = 'admin';
-const validPassword = 'Infotech@1';
-
-
 function Login({ onLogin }: LoginProps) {
-    const [username, setUsername] = useState('');
+    const [username, setUsername] = useState('admin');
     const [password, setPassword] = useState('');
     const [error, setError] = useState<string | null>(null);
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const navigate = useNavigate();
-    const location = useLocation();
 
-    const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        if (username.trim() === validUsername && password === validPassword) {
-            setError(null);
-            onLogin();
-            // Redirect to /form after login
-            navigate('/form');
-            return;
-        }
+        setError(null);
+        setIsSubmitting(true);
 
-        setError('Invalid username or password.');
+        try {
+            const config = await loadLoginConfig();
+            if (!credentialsMatch(config, username, password)) {
+                setError('Invalid username or password.');
+                return;
+            }
+
+            onLogin();
+            navigate('/form');
+        } catch {
+            setError('Could not read login config.json. Check that the file is next to the built site.');
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
@@ -58,7 +63,9 @@ function Login({ onLogin }: LoginProps) {
                         ) : null}
 
                         <div className="form-actions">
-                            <button type="submit" className="primary-button">Login</button>
+                            <button type="submit" className="primary-button" disabled={isSubmitting}>
+                                {isSubmitting ? 'Checking…' : 'Login'}
+                            </button>
                         </div>
                     </form>
                 </div>
