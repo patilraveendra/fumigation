@@ -131,6 +131,33 @@ export async function fetchCertificates() {
     }
 }
 
+export type CertificateSummary = {
+    total: number;
+    mbr: number;
+    alp: number;
+    aus: number;
+};
+
+export async function fetchCertificateSummary(): Promise<CertificateSummary> {
+    try {
+        const res = await fetch(`${apiBaseUrl}/api/certificates/summary`, { method: 'GET', mode: 'cors' });
+        if (!res.ok) {
+            const text = await res.text();
+            throw new Error(`Summary API error (${res.status}): ${text || res.statusText}`);
+        }
+        const json = await res.json();
+        return {
+            total: json.total ?? 0,
+            mbr: json.mbr ?? 0,
+            alp: json.alp ?? 0,
+            aus: json.aus ?? 0,
+        } as CertificateSummary;
+    } catch (error) {
+        if (error instanceof Error) throw new Error(`Failed to reach API at ${apiBaseUrl}: ${error.message}`);
+        throw error;
+    }
+}
+
 export async function pingApi() {
     try {
         const response = await fetch(`${apiBaseUrl}/api/certificates`);

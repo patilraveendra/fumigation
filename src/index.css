@@ -712,11 +712,14 @@ h5 {
 
 .home-page.home-screen .backdrop-left {
     left: -2%;
-    background:
-        linear-gradient(180deg, rgba(173, 194, 211, 0.5), rgba(255, 255, 255, 0.05)),
-        repeating-linear-gradient(90deg, rgba(176, 196, 210, 0.6) 0 2px, rgba(255, 255, 255, 0) 2px 28px),
-        linear-gradient(90deg, rgba(188, 203, 215, 0.35), rgba(233, 239, 244, 0.12));
-    clip-path: polygon(0 8%, 40% 0, 52% 0, 52% 100%, 0 100%);
+    /* Hidden: decorative vertical stripes removed */
+    display: none;
+    /* original background kept for reference:
+         linear-gradient(180deg, rgba(173, 194, 211, 0.5), rgba(255, 255, 255, 0.05)),
+         repeating-linear-gradient(90deg, rgba(176, 196, 210, 0.6) 0 2px, rgba(255, 255, 255, 0) 2px 28px),
+         linear-gradient(90deg, rgba(188, 203, 215, 0.35), rgba(233, 239, 244, 0.12)),
+         clip-path: polygon(0 8%, 40% 0, 52% 0, 52% 100%, 0 100%);
+     */
 }
 
 .home-page.home-screen .backdrop-right {
@@ -767,8 +770,8 @@ h5 {
 .home-page.home-screen .home-center {
     position: relative;
     z-index: 1;
-    padding-top: 54px;
-    padding-bottom: 34px;
+    padding-top: 44px;
+    padding-bottom: 28px;
 }
 
 .home-page.home-screen .home-copy {
@@ -824,12 +827,12 @@ h5 {
 
 .home-page.home-screen .module-card {
     position: relative;
-    background: rgba(255, 255, 255, 0.94);
-    border: 1px solid rgba(222, 228, 236, 0.95);
-    border-radius: 18px;
-    box-shadow: 0 20px 60px rgba(162, 175, 189, 0.18);
-    padding: 40px 44px 28px;
-    min-height: 356px;
+    background: rgba(255, 255, 255, 0.96);
+    border: 1px solid rgba(222, 228, 236, 0.9);
+    border-radius: 14px;
+    box-shadow: 0 12px 36px rgba(140, 152, 165, 0.12);
+    padding: 32px 30px 24px;
+    min-height: 300px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -893,8 +896,8 @@ h5 {
     margin: 0;
     max-width: 420px;
     color: #5e6f86;
-    font-size: 17px;
-    line-height: 1.65;
+    font-size: 15.5px;
+    line-height: 1.5;
 }
 
 .home-page.home-screen .module-button {
@@ -905,11 +908,11 @@ h5 {
     justify-content: space-between;
     border: 0;
     border-radius: 10px;
-    padding: 17px 22px;
+    padding: 14px 18px;
     font-size: 15px;
-    font-weight: 700;
+    font-weight: 800;
     color: #fff;
-    box-shadow: 0 12px 28px rgba(47, 139, 58, 0.16);
+    box-shadow: 0 8px 20px rgba(47, 139, 58, 0.12);
 }
 
 .home-page.home-screen .button-green {

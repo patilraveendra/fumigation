@@ -213,6 +213,26 @@ app.MapDelete("/api/aus/certificates/{certificateId:int}", async (int certificat
     return Results.NoContent();
 });
 
+// Lightweight certificate summary endpoint (aggregated counts)
+app.MapGet("/api/certificates/summary", async (IDatabaseService db) =>
+{
+    try
+    {
+        var counts = await db.GetCertificateSummaryAsync();
+        return Results.Ok(new
+        {
+            total = counts.Total,
+            mbr = counts.Mbr,
+            alp = counts.Alp,
+            aus = counts.Aus
+        });
+    }
+    catch (Exception ex)
+    {
+        return Results.Problem(detail: ex.Message, title: "Failed to read certificate summary", statusCode: 500);
+    }
+});
+
 try
 {
     app.Run();

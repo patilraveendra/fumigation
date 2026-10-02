@@ -11,6 +11,7 @@ public interface IDatabaseService
     Task<bool> DeleteMbCertificateAsync(int certificateId);
     Task<bool> DeleteAlpCertificateAsync(int certificateId);
     Task<bool> DeleteAusCertificateAsync(int certificateId);
+    Task<CertificateCounts> GetCertificateSummaryAsync();
 }
 
 public class DatabaseService : IDatabaseService
@@ -188,4 +189,29 @@ public class DatabaseService : IDatabaseService
         await _context.SaveChangesAsync();
         return true;
     }
+
+    public async Task<CertificateCounts> GetCertificateSummaryAsync()
+    {
+        // Perform lightweight counts at the database level
+        var mbr = await _context.MbCertificates.CountAsync();
+        var alp = await _context.AlpCertificates.CountAsync();
+        var aus = await _context.AusCertificates.CountAsync();
+        var total = mbr + alp + aus;
+
+        return new CertificateCounts
+        {
+            Total = total,
+            Mbr = mbr,
+            Alp = alp,
+            Aus = aus,
+        };
+    }
+}
+
+public class CertificateCounts
+{
+    public int Total { get; set; }
+    public int Mbr { get; set; }
+    public int Alp { get; set; }
+    public int Aus { get; set; }
 }

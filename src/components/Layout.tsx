@@ -1,87 +1,129 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useMemo, useState } from 'react';
+import { Link, NavLink, useLocation } from 'react-router-dom';
 import type { AuthUser } from '../App';
 
-const Layout: React.FC<{ children: React.ReactNode; onLogout?: () => void; authUser?: AuthUser | null }> = ({ children, onLogout, authUser }) => (
-    <div className="d-flex" style={{ minHeight: '100vh', background: '#f4f6fa' }}>
-        {/* Sidebar */}
-        <nav className="sidebar bg-dark text-light d-flex flex-column p-3" style={{ width: 220 }}>
-            <div className="mb-4 d-flex align-items-center gap-2">
-                <img src="/logo.png" alt="PAS" className="sidebar-logo" />
-                <div>
-                    <div className="fs-6 fw-bold">Pest & Solutions</div>
-                    <div className="small text-light-50">Fumigation</div>
-                </div>
-            </div>
-            <ul className="nav nav-pills flex-column mb-auto">
-                <li className="nav-item">
-                    <Link to="/form" className="nav-link text-light">
-                        <i className="bi bi-file-earmark-text me-2" /> Certificate Form
-                    </Link>
-                    <ul className="nav flex-column ms-2">
-                        <li className="nav-item">
-                            <Link to="/create/mbr" className="nav-link text-light small">Create MBR Certificate</Link>
-                        </li>
-                        <li className="nav-item">
-                            <Link to="/create/alp" className="nav-link text-light small">Create ALP Certificate</Link>
-                        </li>
-                        <li className="nav-item">
-                            <Link to="/create/aus" className="nav-link text-light small">Create AUS Certificate</Link>
-                        </li>
-                    </ul>
-                </li>
-                <li className="nav-item">
-                    <div className="nav-link text-light">Saved Certificates</div>
-                    <ul className="nav flex-column ms-2">
-                        <li className="nav-item">
-                            <Link to="/list/mbr" className="nav-link text-light small">MBR Certificates</Link>
-                        </li>
-                        <li className="nav-item">
-                            <Link to="/list/alp" className="nav-link text-light small">ALP Certificates</Link>
-                        </li>
-                        <li className="nav-item">
-                            <Link to="/list/aus" className="nav-link text-light small">AUS Certificates</Link>
-                        </li>
-                    </ul>
-                </li>
-                <li className="nav-item">
-                    <Link to="/report" className="nav-link text-light">
-                        <i className="bi bi-file-earmark-spreadsheet me-2" /> Reports
-                    </Link>
-                </li>
-            </ul>
-            <hr />
-            <div className="mt-auto small text-light-50">&copy; {new Date().getFullYear()} Pest & Solutions</div>
-        </nav>
-        {/* Main content */}
-        <div className="flex-grow-1 d-flex flex-column">
-            {/* Topbar */}
-            <nav className="navbar navbar-expand navbar-dark bg-dark shadow-sm px-4" style={{ minHeight: 56 }}>
-                <div className="container-fluid">
-                    <div className="d-flex align-items-center">
-                        <img src="/logo.png" alt="PAS" className="topbar-logo me-2" />
-                        <span className="navbar-brand mb-0 h6 text-white">Fumigation & Pest Control</span>
-                    </div>
-                    <div className="d-flex align-items-center">
-                        <span className="me-3 text-light small">{authUser?.username ?? 'admin'}</span>
-                        {onLogout ? (
-                            <button type="button" className="btn btn-outline-light btn-sm" onClick={onLogout}>
-                                Logout
-                            </button>
-                        ) : (
-                            <Link to="/" className="btn btn-outline-light btn-sm">Logout</Link>
-                        )}
-                    </div>
-                </div>
-            </nav>
+const certificateFormLinks = [
+    { label: 'Create MBR Certificate', to: '/create/mbr' },
+    { label: 'Create ALP Certificate', to: '/create/alp' },
+    { label: 'Create AUS Certificate', to: '/create/aus' },
+];
 
-            <main className="flex-grow-1 py-4" style={{ minHeight: 0 }}>
-                <div className="container">
-                    <div className="content-card p-4 shadow-sm bg-white rounded">{children}</div>
+const savedCertificatesLinks = [
+    { label: 'MBR Certificates', to: '/list/mbr' },
+    { label: 'ALP Certificates', to: '/list/alp' },
+    { label: 'AUS Certificates', to: '/list/aus' },
+];
+
+const Layout: React.FC<{ children: React.ReactNode; onLogout?: () => void; authUser?: AuthUser | null }> = ({ children, onLogout, authUser }) => {
+    const location = useLocation();
+    const [openMenu, setOpenMenu] = useState<'form' | 'saved' | null>(null);
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+    const isFormGroupActive = useMemo(
+        () => location.pathname.startsWith('/create/') || location.pathname === '/form',
+        [location.pathname],
+    );
+
+    const isSavedGroupActive = useMemo(
+        () => location.pathname.startsWith('/list/'),
+        [location.pathname],
+    );
+
+    const isReportsActive = location.pathname === '/report';
+
+    const renderDropdown = (menu: 'form' | 'saved', items: Array<{ label: string; to: string }>, title: string) => {
+        const isActive = menu === 'form' ? isFormGroupActive : isSavedGroupActive;
+        const isOpen = openMenu === menu;
+
+        return (
+            <div className="nav-dropdown" key={menu}>
+                <button
+                    type="button"
+                    className={`nav-dropdown__trigger ${isActive ? 'is-active' : ''}`}
+                    onClick={() => setOpenMenu((prev) => (prev === menu ? null : menu))}
+                    aria-expanded={isOpen}
+                >
+                    <span>{title}</span>
+                    <span className="nav-dropdown__caret">▾</span>
+                </button>
+
+                {isOpen ? (
+                    <div className="nav-dropdown__menu" role="menu" aria-label={title}>
+                        {items.map((item) => (
+                            <NavLink
+                                key={item.to}
+                                to={item.to}
+                                end={false}
+                                className={({ isActive: itemIsActive }) => `nav-dropdown__item ${itemIsActive ? 'is-active' : ''}`}
+                                onClick={() => setOpenMenu(null)}
+                            >
+                                {item.label}
+                            </NavLink>
+                        ))}
+                    </div>
+                ) : null}
+            </div>
+        );
+    };
+
+    return (
+        <div className="admin-shell">
+            <header className="top-nav">
+                <div className="top-nav__left">
+                    <div className="brand-mark" aria-label="Pest & Solutions brand">
+                        <div className="brand-mark__logo">P</div>
+                        <div className="brand-mark__text">
+                            <span className="brand-mark__name">Pest &amp; Solutions</span>
+                            <small>Fumigation</small>
+                        </div>
+                    </div>
                 </div>
+
+                <div className="top-nav__mobile-actions">
+                    <button
+                        type="button"
+                        className="mobile-menu-toggle"
+                        aria-label="Toggle navigation"
+                        onClick={() => setMobileMenuOpen((prev) => !prev)}
+                    >
+                        ☰
+                    </button>
+                </div>
+
+                <nav className={`top-nav__center ${mobileMenuOpen ? 'is-open' : ''}`} aria-label="Main navigation">
+                    {renderDropdown('form', certificateFormLinks, 'Certificate Form')}
+                    {renderDropdown('saved', savedCertificatesLinks, 'Saved Certificates')}
+
+                    <NavLink
+                        to="/report"
+                        className={({ isActive }) => `top-nav__link ${isActive || isReportsActive ? 'is-active' : ''}`}
+                        onClick={() => setOpenMenu(null)}
+                    >
+                        Reports
+                    </NavLink>
+                </nav>
+
+                <div className="top-nav__right">
+                    <div className="user-pill" aria-label="Current user">
+                        <span className="user-pill__avatar">{(authUser?.username ?? 'A').charAt(0).toUpperCase()}</span>
+                        <span className="user-pill__meta">
+                            <strong>{authUser?.username ?? 'admin'}</strong>
+                            <small>{authUser?.role ?? 'admin'}</small>
+                        </span>
+                    </div>
+                    {onLogout ? (
+                        <button type="button" className="primary-action tiny" onClick={onLogout}>Logout</button>
+                    ) : (
+                        <Link to="/" className="primary-action tiny">Logout</Link>
+                    )}
+                </div>
+            </header>
+
+            <main className="admin-main">
+                <div className="admin-page">{children}</div>
             </main>
         </div>
-    </div>
-);
+    );
+};
 
 export default Layout;

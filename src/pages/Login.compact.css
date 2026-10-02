@@ -10,10 +10,10 @@
 
 .login-card {
     background: #ffffff;
-    border-radius: 16px;
-    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+    border-radius: 12px;
+    box-shadow: 0 8px 22px rgba(15, 23, 42, 0.06);
     padding: 0;
-    min-width: 360px;
+    min-width: 340px;
     max-width: 520px;
     width: 95%;
     margin: 0 16px;
@@ -25,14 +25,14 @@
 
 .login-header {
     width: 100%;
-    background: linear-gradient(90deg, #0f172a 0%, #163b73 100%);
-    padding: 28px 28px;
+    background: linear-gradient(90deg, #2f8b3a 0%, #1f7b2d 100%);
+    padding: 22px 22px;
     text-align: center;
     color: #fff;
 }
 
 .eyebrow {
-    color: rgba(255, 255, 255, 0.9);
+    color: rgba(255, 255, 255, 0.95);
     font-size: 13px;
     font-weight: 700;
     margin-bottom: 6px;
@@ -123,16 +123,16 @@
 
 
 .primary-button {
-    background: linear-gradient(90deg, #2563eb, #1e40af);
+    background: linear-gradient(90deg, #37b05f 0%, #2b9d50 100%);
     color: #fff;
     border: none;
     border-radius: 10px;
-    padding: 10px 24px;
+    padding: 10px 22px;
     font-size: 15px;
-    font-weight: 700;
+    font-weight: 800;
     cursor: pointer;
     transition: transform 0.12s ease, box-shadow 0.12s ease;
-    box-shadow: 0 6px 18px rgba(37, 99, 235, 0.18);
+    box-shadow: 0 8px 18px rgba(47, 139, 58, 0.12);
 }
 
 .primary-button:hover {
