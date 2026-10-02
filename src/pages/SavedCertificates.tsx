@@ -1,28 +1,31 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { fetchCertificates, type CertificateRecord } from '../api/apiService';
-import { pingApi } from '../api/apiService';
+import { deleteCertificate, fetchCertificates, pingApi, type CertificateRecord } from '../api/apiService';
 import { type CertificateData } from '../types/certificate';
 import MbPrint from './MbPrint';
 import AlpPrint from './AlpPrint';
 import './CertificateForm.compact.css';
+import type { AuthUser } from '../App';
 
 interface SavedCertificatesProps {
     onBack: () => void;
     onLogout?: () => void;
     initialType?: 'MB' | 'ALP' | 'AUS';
+    authUser?: AuthUser | null;
 }
 
 function getPartyName(data: Partial<CertificateData>) {
     return data.consigneeName || data.exporterName || data.clientName || 'Unknown party';
 }
 
-function SavedCertificates({ onBack, onLogout, initialType }: SavedCertificatesProps) {
+function SavedCertificates({ onBack, onLogout, initialType, authUser }: SavedCertificatesProps) {
     const [records, setRecords] = useState<CertificateRecord[]>([]);
     const [selectedRecordId, setSelectedRecordId] = useState<string>('');
     const [status, setStatus] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [selectedType, setSelectedType] = useState<'MB' | 'ALP' | 'AUS'>(initialType ?? 'MB');
+    const [isDeleting, setIsDeleting] = useState<string | null>(null);
+    const isAdmin = authUser?.role === 'admin';
 
     useEffect(() => {
         const load = async () => {
@@ -85,6 +88,41 @@ function SavedCertificates({ onBack, onLogout, initialType }: SavedCertificatesP
         } catch (e) {
             console.error('Failed to open edit form', e);
             setStatus('Failed to open edit form');
+        }
+    };
+
+    const handleDelete = async (record: CertificateRecord) => {
+        if (!isAdmin) {
+            return;
+        }
+
+        const type = (record.data.certificateType ?? 'MB') as 'MB' | 'ALP' | 'AUS';
+        const certificateId = (record as any).certificateId ?? (record as any).id;
+        if (!certificateId) {
+            setStatus('This certificate does not have an ID and cannot be deleted.');
+            return;
+        }
+
+        const confirmed = window.confirm(`Delete this ${type} certificate? This action cannot be undone.`);
+        if (!confirmed) {
+            return;
+        }
+
+        setIsDeleting(record.id);
+        setStatus(null);
+
+        try {
+            await deleteCertificate(type, String(certificateId));
+            setRecords((prev) => prev.filter((item) => item.id !== record.id));
+            setStatus(`${type} certificate deleted successfully.`);
+            if (selectedRecordId === record.id) {
+                setSelectedRecordId('');
+            }
+        } catch (error) {
+            const message = error instanceof Error ? error.message : 'Unknown error';
+            setStatus(`Delete failed: ${message}`);
+        } finally {
+            setIsDeleting(null);
         }
     };
 
@@ -161,6 +199,15 @@ function SavedCertificates({ onBack, onLogout, initialType }: SavedCertificatesP
                                                         <div className="d-flex gap-2">
                                                             <button type="button" className="btn btn-sm btn-outline-primary" onClick={(e) => { e.stopPropagation(); setSelectedRecordId(record.id); openInPrintTab(record); }}>View</button>
                                                             <button type="button" className="btn btn-sm btn-outline-secondary" onClick={(e) => { e.stopPropagation(); handleEdit(record); }}>Edit</button>
+                                                            <button
+                                                                type="button"
+                                                                className="btn btn-sm btn-outline-danger"
+                                                                onClick={(e) => { e.stopPropagation(); void handleDelete(record); }}
+                                                                disabled={!isAdmin || isDeleting === record.id}
+                                                                title={isAdmin ? 'Delete certificate' : 'Only admin can delete certificates'}
+                                                            >
+                                                                {isDeleting === record.id ? 'Deleting...' : 'Delete'}
+                                                            </button>
                                                         </div>
                                                     </td>
                                                 </tr>

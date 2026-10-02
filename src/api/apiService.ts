@@ -143,3 +143,30 @@ export async function pingApi() {
         return { ok: false, status: 0, body: 'Unknown error' };
     }
 }
+
+export async function deleteCertificate(type: 'MB' | 'ALP' | 'AUS', certificateId: number | string) {
+    if (!certificateId && certificateId !== 0) {
+        throw new Error('Certificate ID is required for deletion.');
+    }
+
+    const endpoint = type === 'MB'
+        ? `${apiBaseUrl}/api/mb/certificates/${certificateId}`
+        : type === 'AUS'
+            ? `${apiBaseUrl}/api/aus/certificates/${certificateId}`
+            : `${apiBaseUrl}/api/alp/certificates/${certificateId}`;
+
+    const response = await fetch(endpoint, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        mode: 'cors',
+    });
+
+    if (!response.ok) {
+        const text = await response.text();
+        throw new Error(`Delete failed (${response.status}): ${text || response.statusText}`);
+    }
+
+    return response.status === 204 ? true : response.json();
+}

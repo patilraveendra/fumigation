@@ -2,15 +2,18 @@
   "users": [
     {
       "username": "admin",
-      "password": "Infotech@1"
+      "password": "Infotech@1",
+      "role": "admin"
     },
     {
       "username": "staff",
-      "password": "staff@123"
+      "password": "staff@123",
+      "role": "staff"
     },
     {
       "username": "operator",
-      "password": "operator@123"
+      "password": "operator@123",
+      "role": "operator"
     }
   ]
 }

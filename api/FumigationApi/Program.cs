@@ -140,6 +140,17 @@ app.MapGet("/api/mb/certificates", async (IDatabaseService db) =>
     return Results.Ok(records);
 });
 
+app.MapDelete("/api/mb/certificates/{certificateId:int}", async (int certificateId, IDatabaseService db) =>
+{
+    var deleted = await db.DeleteMbCertificateAsync(certificateId);
+    if (!deleted)
+    {
+        return Results.NotFound(new { message = "MB certificate not found." });
+    }
+
+    return Results.NoContent();
+});
+
 // SQL-backed ALP Certificate endpoints
 app.MapPost("/api/alp/certificates", async (AlpCertificate record, IDatabaseService db) =>
 {
@@ -160,6 +171,17 @@ app.MapGet("/api/alp/certificates", async (IDatabaseService db) =>
     return Results.Ok(records);
 });
 
+app.MapDelete("/api/alp/certificates/{certificateId:int}", async (int certificateId, IDatabaseService db) =>
+{
+    var deleted = await db.DeleteAlpCertificateAsync(certificateId);
+    if (!deleted)
+    {
+        return Results.NotFound(new { message = "ALP certificate not found." });
+    }
+
+    return Results.NoContent();
+});
+
 // SQL-backed AUS Certificate endpoints
 app.MapPost("/api/aus/certificates", async (AusCertificate record, IDatabaseService db) =>
 {
@@ -178,6 +200,17 @@ app.MapGet("/api/aus/certificates", async (IDatabaseService db) =>
 {
     var records = await db.GetAllAusCertificatesAsync();
     return Results.Ok(records);
+});
+
+app.MapDelete("/api/aus/certificates/{certificateId:int}", async (int certificateId, IDatabaseService db) =>
+{
+    var deleted = await db.DeleteAusCertificateAsync(certificateId);
+    if (!deleted)
+    {
+        return Results.NotFound(new { message = "AUS certificate not found." });
+    }
+
+    return Results.NoContent();
 });
 
 try

@@ -1,10 +1,10 @@
 import { useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { credentialsMatch, loadLoginConfig } from '../auth/loginConfig';
+import { findMatchingUser, loadLoginConfig } from '../auth/loginConfig';
 import './Login.compact.css';
 
 interface LoginProps {
-    onLogin: () => void;
+    onLogin: (user: { username: string; role: 'admin' | 'staff' | 'operator' }) => void;
 }
 
 function Login({ onLogin }: LoginProps) {
@@ -21,12 +21,13 @@ function Login({ onLogin }: LoginProps) {
 
         try {
             const config = await loadLoginConfig();
-            if (!credentialsMatch(config, username, password)) {
+            const user = findMatchingUser(config, username, password);
+            if (!user) {
                 setError('Invalid username or password.');
                 return;
             }
 
-            onLogin();
+            onLogin({ username: user.username, role: user.role });
             navigate('/form');
         } catch {
             setError('Could not read login config.json. Check that the file is next to the built site.');

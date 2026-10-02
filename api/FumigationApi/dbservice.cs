@@ -1,4 +1,3 @@
-
 using Microsoft.EntityFrameworkCore;
 
 public interface IDatabaseService
@@ -9,6 +8,9 @@ public interface IDatabaseService
     Task<List<MbCertificate>> GetAllMbCertificatesAsync();
     Task<List<AlpCertificate>> GetAllAlpCertificatesAsync();
     Task<List<AusCertificate>> GetAllAusCertificatesAsync();
+    Task<bool> DeleteMbCertificateAsync(int certificateId);
+    Task<bool> DeleteAlpCertificateAsync(int certificateId);
+    Task<bool> DeleteAusCertificateAsync(int certificateId);
 }
 
 public class DatabaseService : IDatabaseService
@@ -134,5 +136,56 @@ public class DatabaseService : IDatabaseService
             .Include(c => c.Containers)
             .OrderByDescending(c => c.CreatedDate)
             .ToListAsync();
+    }
+
+    public async Task<bool> DeleteMbCertificateAsync(int certificateId)
+    {
+        var entity = await _context.MbCertificates
+            .Include(c => c.Containers)
+            .FirstOrDefaultAsync(c => c.CertificateId == certificateId);
+
+        if (entity == null)
+        {
+            return false;
+        }
+
+        _context.MbContainers.RemoveRange(entity.Containers);
+        _context.MbCertificates.Remove(entity);
+        await _context.SaveChangesAsync();
+        return true;
+    }
+
+    public async Task<bool> DeleteAlpCertificateAsync(int certificateId)
+    {
+        var entity = await _context.AlpCertificates
+            .Include(c => c.Containers)
+            .FirstOrDefaultAsync(c => c.CertificateId == certificateId);
+
+        if (entity == null)
+        {
+            return false;
+        }
+
+        _context.AlpContainers.RemoveRange(entity.Containers);
+        _context.AlpCertificates.Remove(entity);
+        await _context.SaveChangesAsync();
+        return true;
+    }
+
+    public async Task<bool> DeleteAusCertificateAsync(int certificateId)
+    {
+        var entity = await _context.AusCertificates
+            .Include(c => c.Containers)
+            .FirstOrDefaultAsync(c => c.CertificateId == certificateId);
+
+        if (entity == null)
+        {
+            return false;
+        }
+
+        _context.AusContainers.RemoveRange(entity.Containers);
+        _context.AusCertificates.Remove(entity);
+        await _context.SaveChangesAsync();
+        return true;
     }
 }

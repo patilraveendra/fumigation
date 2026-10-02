@@ -1,7 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import type { AuthUser } from '../App';
 
-const Layout: React.FC<{ children: React.ReactNode; onLogout?: () => void }> = ({ children, onLogout }) => (
+const Layout: React.FC<{ children: React.ReactNode; onLogout?: () => void; authUser?: AuthUser | null }> = ({ children, onLogout, authUser }) => (
     <div className="d-flex" style={{ minHeight: '100vh', background: '#f4f6fa' }}>
         {/* Sidebar */}
         <nav className="sidebar bg-dark text-light d-flex flex-column p-3" style={{ width: 220 }}>
@@ -62,7 +63,7 @@ const Layout: React.FC<{ children: React.ReactNode; onLogout?: () => void }> = (
                         <span className="navbar-brand mb-0 h6 text-white">Fumigation & Pest Control</span>
                     </div>
                     <div className="d-flex align-items-center">
-                        <span className="me-3 text-light small">admin</span>
+                        <span className="me-3 text-light small">{authUser?.username ?? 'admin'}</span>
                         {onLogout ? (
                             <button type="button" className="btn btn-outline-light btn-sm" onClick={onLogout}>
                                 Logout

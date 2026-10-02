@@ -1,6 +1,9 @@
+export type UserRole = 'admin' | 'staff' | 'operator';
+
 export type LoginUser = {
     username: string;
     password: string;
+    role: UserRole;
 };
 
 export type LoginConfig = {
@@ -22,17 +25,22 @@ export async function loadLoginConfig(): Promise<LoginConfig> {
         users: data.users.map((user) => ({
             username: String(user?.username ?? '').trim(),
             password: String(user?.password ?? ''),
+            role: (String(user?.role ?? 'staff').trim().toLowerCase() as UserRole),
         })),
     };
 }
 
-export function credentialsMatch(config: LoginConfig, username: string, password: string): boolean {
+export function findMatchingUser(config: LoginConfig, username: string, password: string): LoginUser | null {
     const enteredUser = username.trim();
     if (!enteredUser || !password) {
-        return false;
+        return null;
     }
 
-    return config.users.some(
+    return config.users.find(
         (user) => user.username === enteredUser && user.password.length > 0 && user.password === password,
-    );
+    ) ?? null;
+}
+
+export function credentialsMatch(config: LoginConfig, username: string, password: string): boolean {
+    return findMatchingUser(config, username, password) !== null;
 }
