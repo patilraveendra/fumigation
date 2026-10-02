@@ -257,3 +257,176 @@
 .compact-form .compact-table td {
     padding: 4px 8px;
 }
+
+/* Shared admin portal treatment for all certificate forms. Existing controls and
+   their behaviour stay unchanged; this only standardises the visual layer. */
+:root {
+    --portal-blue: #1d70b8;
+    --portal-blue-dark: #003078;
+    --portal-ink: #0b0c0c;
+    --portal-muted: #505a5f;
+    --portal-border: #b1b4b6;
+    --portal-focus: #ffdd00;
+}
+
+.page-shell.container-fluid {
+    min-height: calc(100vh - 64px);
+    padding: 24px clamp(12px, 2.5vw, 32px) 40px;
+    background: #f3f2f1;
+    color: var(--portal-ink);
+}
+
+.page-shell.container-fluid > .row:first-child {
+    max-width: 1440px;
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 0 2px 16px;
+    border-bottom: 1px solid var(--portal-border);
+}
+
+.page-shell h2,
+.page-shell h3,
+.page-shell h4,
+.page-shell h5 { color: var(--portal-ink); font-weight: 700; }
+.page-shell h2 { font-size: 1.65rem; }
+.page-shell h5 { font-size: 1.05rem; }
+.page-shell .text-muted { color: var(--portal-muted) !important; }
+
+.compact-form {
+    width: 100%;
+    max-width: 1440px;
+    margin: 20px auto 0;
+    padding: 0 0 22px;
+    border: 0;
+    background: transparent;
+    font-size: 15px;
+}
+
+.compact-form > .mb-2 {
+    margin: 0 !important;
+    padding: 14px 16px;
+    border: 1px solid var(--portal-border);
+    border-bottom: 0;
+    background: #e9eff5;
+}
+
+.compact-form .card {
+    margin-bottom: 14px;
+    border: 1px solid var(--portal-border);
+    border-radius: 0;
+    background: #fff;
+    box-shadow: 0 1px 1px rgba(11, 12, 12, 0.04);
+}
+
+.compact-form .card-header {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--portal-border);
+    border-radius: 0;
+    background: #e9eff5;
+    color: var(--portal-ink);
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.compact-form .card-body { padding: 14px; }
+
+.compact-form label.form-label,
+.compact-form .field-item span {
+    display: block;
+    margin-bottom: 4px;
+    color: var(--portal-ink);
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.35;
+}
+
+.compact-form .form-control,
+.compact-form .form-select,
+.compact-form textarea,
+.compact-form input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]),
+.compact-form select {
+    min-height: 40px;
+    width: 100%;
+    padding: 7px 9px;
+    border: 2px solid var(--portal-border);
+    border-radius: 0;
+    background: #fff;
+    color: var(--portal-ink);
+    font-size: 15px;
+    line-height: 1.35;
+    box-shadow: none;
+}
+
+.compact-form textarea { min-height: 76px; }
+
+.compact-form .form-control:focus,
+.compact-form .form-select:focus,
+.compact-form textarea:focus,
+.compact-form input:focus,
+.compact-form select:focus,
+.compact-form button:focus,
+.compact-form a:focus {
+    border-color: var(--portal-ink) !important;
+    outline: 3px solid var(--portal-focus) !important;
+    outline-offset: 0;
+    box-shadow: none;
+}
+
+.compact-form .form-control:disabled,
+.compact-form .form-select:disabled { background: #f3f2f1; color: var(--portal-muted); }
+
+.compact-form .btn,
+.compact-form .primary-button,
+.compact-form button.primary-button {
+    min-height: 40px;
+    padding: 8px 14px;
+    border: 2px solid transparent;
+    border-radius: 0;
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.2;
+    box-shadow: none;
+}
+
+.compact-form .btn-success,
+.compact-form .btn-primary,
+.compact-form .primary-button {
+    background: var(--portal-blue);
+    border-color: var(--portal-blue);
+    color: #fff;
+}
+
+.compact-form .btn-success:hover,
+.compact-form .btn-primary:hover,
+.compact-form .primary-button:hover { background: var(--portal-blue-dark); border-color: var(--portal-blue-dark); }
+
+.compact-form .btn-outline-primary,
+.compact-form .btn-outline-secondary {
+    border-color: var(--portal-blue);
+    color: var(--portal-blue-dark);
+    background: #fff;
+}
+
+.compact-form .form-check-input {
+    width: 20px;
+    height: 20px;
+    margin-top: 0;
+    border: 2px solid var(--portal-border);
+    border-radius: 0;
+}
+
+.compact-form .form-check-label { font-weight: 600; }
+.compact-form .compact-table { border: 1px solid var(--portal-border); }
+.compact-form .compact-table th { background: #e9eff5; color: var(--portal-ink); }
+.compact-form .compact-table th,
+.compact-form .compact-table td { padding: 8px 10px; border-color: var(--portal-border); }
+
+@media (max-width: 767px) {
+    .page-shell.container-fluid { padding: 16px 10px 28px; }
+    .compact-form .card-body { padding: 12px 10px; }
+    .compact-form .form-actions,
+    .compact-form .d-flex.justify-content-end { flex-wrap: wrap; justify-content: stretch !important; }
+    .compact-form .form-actions > *,
+    .compact-form .d-flex.justify-content-end > .btn { flex: 1 1 100%; margin: 0 0 8px !important; }
+}
