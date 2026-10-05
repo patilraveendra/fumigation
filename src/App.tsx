@@ -13,10 +13,14 @@ const STORAGE_KEY = 'fumigation-auth-user';
 function App() {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [authUser, setAuthUser] = useState<AuthUser | null>(null);
+    const [authReady, setAuthReady] = useState(false);
 
     useEffect(() => {
         const stored = localStorage.getItem(STORAGE_KEY);
-        if (!stored) return;
+        if (!stored) {
+            setAuthReady(true);
+            return;
+        }
 
         try {
             const parsed = JSON.parse(stored) as Partial<AuthUser>;
@@ -26,6 +30,8 @@ function App() {
             }
         } catch {
             localStorage.removeItem(STORAGE_KEY);
+        } finally {
+            setAuthReady(true);
         }
     }, []);
 
@@ -45,6 +51,7 @@ function App() {
         <Router>
             <AppRoutes
                 isAuthenticated={isAuthenticated}
+                authReady={authReady}
                 authUser={authUser}
                 onLogin={handleLogin}
                 onLogout={handleLogout}

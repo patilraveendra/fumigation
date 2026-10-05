@@ -385,7 +385,7 @@
 }
 
 .admin-main {
-    padding: 22px 18px 40px;
+    padding: 6px 18px 20px;
 }
 
 .admin-page {
@@ -453,10 +453,25 @@
     color: #1d2736;
 }
 
-.page-header {
-    max-width: 1500px;
-    margin: 0 auto 8px;
-    padding: 8px 12px 0;
+.page-shell .content {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+}
+
+.page-shell .content header {
+    margin-bottom: 6px;
+}
+
+.page-shell .content section {
+    margin-top: 12px !important;
+}
+
+.page-shell .summary-card {
+    padding: 16px 16px 12px;
+}
+
+.page-shell .total-row {
+    margin-top: 6px;
 }
 
 /* Dashboard summary styles */

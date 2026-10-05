@@ -2,7 +2,7 @@ import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import CertificateForm from './CertificateForm';
 
-const CreateAlpForm: React.FC = () => {
+const CreateAlpForm: React.FC<{ onLogout?: () => void }> = ({ onLogout }) => {
     const location = useLocation();
     const navigate = useNavigate();
     const initialValues = location.state?.initialValues;
@@ -14,7 +14,7 @@ const CreateAlpForm: React.FC = () => {
     }, [initialValues, navigate]);
 
     if (!initialValues) return null;
-    return <CertificateForm initialType="ALP" initialValues={initialValues} />;
+    return <CertificateForm initialType="ALP" initialValues={initialValues} onLogout={onLogout} />;
 };
 
 export default CreateAlpForm;

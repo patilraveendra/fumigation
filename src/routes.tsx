@@ -20,18 +20,28 @@ import type { AuthUser } from "./App";
 
 function AppRoutes({
     isAuthenticated,
+    authReady,
     authUser,
     onLogin,
     onLogout,
     setIsAuthenticated,
 }: {
     isAuthenticated: boolean;
+    authReady: boolean;
     authUser: AuthUser | null;
     onLogin: (user: AuthUser) => void;
     onLogout: () => void;
     setIsAuthenticated: (v: boolean) => void;
 }) {
     const navigate = useNavigate();
+    const handleLogout = () => {
+        onLogout();
+        navigate('/login', { replace: true });
+    };
+
+    if (!authReady) {
+        return <div aria-busy="true" />;
+    }
 
     return (
         <Routes>
@@ -42,7 +52,7 @@ function AppRoutes({
                     <Route
                         path="/dashboard"
                         element={
-                            <Layout onLogout={onLogout} authUser={authUser}>
+                            <Layout onLogout={handleLogout} authUser={authUser}>
                                 <Dashboard />
                             </Layout>
                         }
@@ -52,39 +62,39 @@ function AppRoutes({
                     <Route
                         path="/list/mbr"
                         element={
-                            <Layout onLogout={onLogout} authUser={authUser}>
-                                <MbrCertificates onLogout={onLogout} onBack={() => { navigate('/form'); }} authUser={authUser} />
+                            <Layout onLogout={handleLogout} authUser={authUser}>
+                                <MbrCertificates onLogout={handleLogout} onBack={() => { navigate('/form'); }} authUser={authUser} />
                             </Layout>
                         }
                     />
                     <Route
                         path="/list/alp"
                         element={
-                            <Layout onLogout={onLogout} authUser={authUser}>
-                                <AlpCertificates onLogout={onLogout} onBack={() => { navigate('/form'); }} authUser={authUser} />
+                            <Layout onLogout={handleLogout} authUser={authUser}>
+                                <AlpCertificates onLogout={handleLogout} onBack={() => { navigate('/form'); }} authUser={authUser} />
                             </Layout>
                         }
                     />
                     <Route
                         path="/list/aus"
                         element={
-                            <Layout onLogout={onLogout} authUser={authUser}>
-                                <AusCertificates onLogout={onLogout} onBack={() => { navigate('/form'); }} authUser={authUser} />
+                            <Layout onLogout={handleLogout} authUser={authUser}>
+                                <AusCertificates onLogout={handleLogout} onBack={() => { navigate('/form'); }} authUser={authUser} />
                             </Layout>
                         }
                     />
                     <Route
                         path="/report"
                         element={
-                            <Layout onLogout={onLogout} authUser={authUser}>
-                                <CertificateReport onLogout={onLogout} onBack={() => { navigate('/dashboard'); }} authUser={authUser} />
+                            <Layout onLogout={handleLogout} authUser={authUser}>
+                                <CertificateReport onLogout={handleLogout} onBack={() => { navigate('/dashboard'); }} authUser={authUser} />
                             </Layout>
                         }
                     />
                     <Route
                         path="/create/mbr"
                         element={
-                            <Layout onLogout={onLogout} authUser={authUser}>
+                            <Layout onLogout={handleLogout} authUser={authUser}>
                                 <NewMbrStart />
                             </Layout>
                         }
@@ -92,15 +102,15 @@ function AppRoutes({
                     <Route
                         path="/create/mbr/form"
                         element={
-                            <Layout onLogout={onLogout} authUser={authUser}>
-                                <CreateMbrForm />
+                            <Layout onLogout={handleLogout} authUser={authUser}>
+                                <CreateMbrForm onLogout={handleLogout} />
                             </Layout>
                         }
                     />
                     <Route
                         path="/create/alp"
                         element={
-                            <Layout onLogout={onLogout} authUser={authUser}>
+                            <Layout onLogout={handleLogout} authUser={authUser}>
                                 <NewAlpStart />
                             </Layout>
                         }
@@ -108,7 +118,7 @@ function AppRoutes({
                     <Route
                         path="/create/aus"
                         element={
-                            <Layout onLogout={onLogout} authUser={authUser}>
+                            <Layout onLogout={handleLogout} authUser={authUser}>
                                 <NewAusStart />
                             </Layout>
                         }
@@ -116,21 +126,26 @@ function AppRoutes({
                     <Route
                         path="/create/alp/form"
                         element={
-                            <Layout onLogout={onLogout} authUser={authUser}>
-                                <CreateAlpForm />
+                            <Layout onLogout={handleLogout} authUser={authUser}>
+                                <CreateAlpForm onLogout={handleLogout} />
                             </Layout>
                         }
                     />
                     <Route
                         path="/create/aus/form"
                         element={
-                            <Layout onLogout={onLogout} authUser={authUser}>
-                                <CreateAusForm />
+                            <Layout onLogout={handleLogout} authUser={authUser}>
+                                <CreateAusForm onLogout={handleLogout} />
                             </Layout>
                         }
                     />
                 </>
             )}
+            <Route path="/dashboard" element={<Navigate to="/login" replace />} />
+            <Route path="/form" element={<Navigate to="/login" replace />} />
+            <Route path="/list/*" element={<Navigate to="/login" replace />} />
+            <Route path="/create/*" element={<Navigate to="/login" replace />} />
+            <Route path="/report" element={<Navigate to="/login" replace />} />
             <Route path="/print" element={<PrintCertificate />} />
             <Route path="*" element={<NotFound />} />
         </Routes>

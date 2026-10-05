@@ -2,7 +2,7 @@ import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import CertificateForm from './CertificateForm';
 
-const CreateMbrForm: React.FC = () => {
+const CreateMbrForm: React.FC<{ onLogout?: () => void }> = ({ onLogout }) => {
     const location = useLocation();
     const navigate = useNavigate();
     const state = (location.state as any) || {};
@@ -13,7 +13,7 @@ const CreateMbrForm: React.FC = () => {
             initialType="MB"
             initialValues={initialValues}
             onViewSaved={() => navigate('/list/mbr')}
-            onLogout={() => navigate('/')}
+            onLogout={onLogout ?? (() => navigate('/'))}
         />
     );
 };
